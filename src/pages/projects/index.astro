@@ -1,15 +1,15 @@
 ---
-import { getCollection } from "astro:content";
 import Section from "../../components/common/Section.astro";
-import ProjectSnippet from "../../components/ProjectSnippet.astro";
 import Layout from "../../layouts/Layout.astro";
-import { getConfigurationCollection } from "../../lib/utils";
-
-const projects = (await getCollection("project")).sort(
-	(a, b) => b.data.timestamp.valueOf() - a.data.timestamp.valueOf(),
-);
+import { getConfigurationCollection, getRepositories, getRecentEvents } from "../../lib/utils";
+import RepositoryCard from "../../components/github/RepositoryCard";
+import ActivityFeed from "../../components/github/ActivityFeed";
+import ContributionCalendar from "../../components/github/ContributionCalendar";
 
 const { data: config } = await getConfigurationCollection();
+
+const repositories = await getRepositories();
+const recentEvents = await getRecentEvents();
 ---
 
 <Layout>
@@ -44,25 +44,68 @@ const { data: config } = await getConfigurationCollection();
     <meta name="language" content="English" />
     <link rel="canonical" href={`${config.site.baseUrl}/projects`} />
   </Fragment>
+
   <Section class="py-4 my-8">
-    <div class="flex items-center gap-4 pt-8 pb-16">
+    <div class="flex items-center gap-4 pt-8 pb-12">
       <h1 class="font-display text-3xl sm:text-4xl leading-loose">{config.texts.projectsName}</h1>
+      <a
+        href="https://github.com/veegishx"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-2 px-3 py-2 text-sm bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+          <path d="M9 18c-4.51 2-5-2-7-2" />
+        </svg>
+        @veegishx
+      </a>
     </div>
-    <ul>
-      {
-        projects.map((project) => (
-          <li>
-            <ProjectSnippet
-              title={project.data.title}
-              description={project.data.description}
-              url={`/projects/${project.data.slug}`}
-              githubUrl={project.data.githubUrl}
-              liveUrl={project.data.liveDemoUrl}
-              tags={project.data.tags ?? []}
-            />
-          </li>
-        ))
-      }
-    </ul>
+
+    <!-- <section class="mb-12">
+      <h2 class="text-xl font-display mb-6">Contribution Activity</h2>
+      <div class="p-6 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-lg">
+        <ContributionCalendar client:load data={{ total: 0, contributions: [] }} />
+      </div>
+    </section> -->
+
+    <section class="mb-12">
+      <h2 class="text-xl font-display mb-6">Recent Repositories</h2>
+      {repositories.length > 0 ? (
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {repositories.slice(0, 12).map((repo) => (
+            <RepositoryCard client:load repo={repo} />
+          ))}
+        </div>
+      ) : (
+        <p class="text-zinc-500 dark:text-zinc-400">No repositories found</p>
+      )}
+      {repositories.length > 12 && (
+        <div class="mt-6 text-center">
+          <a
+            href={`https://github.com/veegishx?tab=repositories`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg transition-colors"
+          >
+            View all {repositories.length} repositories
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+              <polyline points="15 3 21 3 21 9" />
+              <line x1="10" y1="14" x2="21" y2="3" />
+            </svg>
+          </a>
+        </div>
+      )}
+    </section>
+
+    <section>
+      <h2 class="text-xl font-display mb-6">Recent Activity</h2>
+      {recentEvents.length > 0 ? (
+        <ActivityFeed client:load events={recentEvents.slice(0, 10)} />
+      ) : (
+        <p class="text-zinc-500 dark:text-zinc-400">No recent activity</p>
+      )}
+    </section>
   </Section>
 </Layout>
