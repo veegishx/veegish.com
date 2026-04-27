@@ -1,0 +1,32 @@
+---
+import Section from "../components/common/Section.astro";
+import Graph from "../components/react/Graph";
+import Layout from "../layouts/Layout.astro";
+import { getConfigurationCollection } from "../lib/utils";
+
+const { data: config } = await getConfigurationCollection();
+---
+
+<Layout>
+  <Fragment slot="head">
+    <title>Knowledge Graph • {config.personal.name}</title>
+    <meta name="description" content="Interactive knowledge graph showing connections between all blog posts and projects." />
+    <meta property="og:title" content={`Knowledge Graph • ${config.personal.name}`} />
+    <meta property="og:description" content="Interactive knowledge graph showing connections between all blog posts and projects." />
+  </Fragment>
+  <Section class="py-8">
+    <div class="flex items-center gap-4 mb-8">
+      <a href="/blog" class="text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">
+        ← Back to blog
+      </a>
+    </div>
+    <h1 class="text-3xl sm:text-4xl font-display mb-4">Knowledge Graph</h1>
+    <p class="text-zinc-600 dark:text-zinc-400 mb-8 max-w-2xl">
+      An interactive visualization of all blog posts and projects, showing how they connect through wiki links.
+      Drag nodes to reposition, scroll to zoom, and click any node to visit that post.
+    </p>
+    <div class="border border-zinc-300 dark:border-zinc-700 rounded-lg overflow-hidden bg-white dark:bg-zinc-900">
+      <Graph client:load className="min-h-[600px]" />
+    </div>
+  </Section>
+</Layout>

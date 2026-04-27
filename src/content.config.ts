@@ -148,12 +148,12 @@ const configuration = defineCollection({
       /**
        * The title displayed in the hero section.
        */
-      title: z.string().default("Zaggonaut"),
+      title: z.string().default("Veegish"),
 
       /**
        * The subtitle displayed in the hero section.
        */
-      subtitle: z.string().default("Retro-Inspired Theme &<br>Built for Astro"),
+      subtitle: z.string().default("My personal space"),
 
       /**
        * The URL of the hero image, used as a background image in the hero section.
@@ -178,7 +178,7 @@ const configuration = defineCollection({
       /**
        * The name of the site owner or author, used in various places throughout the site.
        */
-      name: z.string().default("Zaggonaut"),
+      name: z.string().default("Veegish"),
 
       /**
        * The GitHub profile URL of the site owner or author.
@@ -244,7 +244,7 @@ const configuration = defineCollection({
  * It loads markdown files from the `content/blogs` directory and defines the schema for each blog post.
  */
 const blog = defineCollection({
-  loader: glob({ pattern: "**/*.md", base: "./content/blogs" }),
+  loader: glob({ pattern: "**/*.mdx", base: "./content/blogs" }),
   schema: z
     .object({
       /**
@@ -278,6 +278,26 @@ const blog = defineCollection({
       tags: z.array(z.string()).optional(),
 
       /**
+       * Legacy alias for tags - categories from Svelte migration.
+       */
+      categories: z.array(z.string()).optional(),
+
+      /**
+       * Legacy field - author from Svelte migration (ignored).
+       */
+      author: z.string().optional(),
+
+      /**
+       * Legacy field - published status from Svelte migration (ignored).
+       */
+      published: z.boolean().optional(),
+
+      /**
+       * Legacy field - thumbnail from Svelte migration (ignored).
+       */
+      thumbnail: z.string().optional(),
+
+      /**
        * The estimated reading time of the blog post, in minutes.
        */
       readTime: z.number().optional(),
@@ -290,7 +310,7 @@ const blog = defineCollection({
       /**
        * The timestamp of the blog post, used for sorting and displaying the date.
        */
-      timestamp: z.date().transform((val) => new Date(val)),
+      date: z.coerce.date(),
     })
     .transform((data) => {
       const slug =
@@ -302,6 +322,8 @@ const blog = defineCollection({
       const newData = {
         ...data,
         slug,
+        tags: data.tags ?? data.categories,
+        timestamp: data.date,
       };
       return newData;
     }),

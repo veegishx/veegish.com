@@ -5,44 +5,44 @@
 baseUrl = "http://zaggonaut.dev"
 
 [_.globalMeta]
-title = "Zaggonaut"
-description = "Retro-Inspired Theme & Built for Astro"
-longDescription = "Zaggonaut is a retro-inspired theme for Astro, built using TypeScript, TailwindCSS, and Astro."
-cardImage = "https://zaggonaut.dev/michael-dam-unsplash.webp"
+title = "Veegish Ramdani"
+description = "My personal space"
+longDescription = "Everything here is about me, my thoughts, my projects, and my journey."
+cardImage = "https://avatars.githubusercontent.com/u/8150534"
 keywords = ["web development", "design", "technology"]
 
 [_.blogMeta]
-title = "Zaggonaut Blog"
+title = "Veegish Blog"
 description = "Practical wisdom, unfiltered thoughts, and hot takes."
 longDescription = "Web development, tech trends, and the occasional programming mishap."
-cardImage = "https://zaggonaut.dev/michael-dam-unsplash.webp"
+cardImage = "https://avatars.githubusercontent.com/u/8150534"
 keywords = ["web development", "design", "technology"]
 
 [_.projectMeta]
-title = "Zaggonaut Projects"
+title = "Veegish Projects"
 description = "A list of my web development projects and developer tools."
 longDescription = "All of my projects, including both frontend and full-stack applications."
-cardImage = "https://zaggonaut.dev/michael-dam-unsplash.webp"
+cardImage = "https://avatars.githubusercontent.com/u/8150534"
 keywords = ["web development", "design", "technology"]
 
 [_.notFoundMeta]
-title = "Zaggonaut 404"
+title = "Veegish 404"
 description = "The page you are looking for does not exist."
 longDescription = "The page you are looking for does not exist. Maybe it never existed. Spooky."
-cardImage = "https://zaggonaut.dev/michael-dam-unsplash.webp"
+cardImage = "https://avatars.githubusercontent.com/u/8150534"
 
 [_.hero]
-title = "Zaggonaut"
-subtitle = "Retro-Inspired Theme &<br />Built for Astro"
-image = "https://zaggonaut.dev/michael-dam-unsplash.webp"
+title = "Veegish"
+subtitle = "A personal space for my thoughts, projects, and journey"
+image = "https://avatars.githubusercontent.com/u/8150534"
 ctaText = "View Projects"
 ctaUrl = "/projects"
 
 [_.personal]
-name = "Zaggonaut"
-githubProfile = "https://github.com/RATIU5/zaggonaut"
-twitterProfile = "https://twitter.com"
-linkedinProfile = "https://linkedin.com/"
+name = "Veegish Ramdani"
+githubProfile = "https://github.com/VEEGISHx"
+twitterProfile = "https://twitter.com/veegish24"
+linkedinProfile = "https://mu.linkedin.com/in/veegish"
 
 [_.texts]
 articlesName = "Articles"

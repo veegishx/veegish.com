@@ -13,14 +13,22 @@
     "lint": "biome lint --write"
   },
   "dependencies": {
+    "@astrojs/mdx": "^5.0.4",
+    "@astrojs/react": "^5.0.4",
+    "@flowershow/remark-wiki-link": "^3.4.0",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.2.2",
+    "@types/d3": "^7.4.3",
     "astro": "^6.1.2",
+    "d3": "^7.9.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
     "tailwindcss": "^4.2.2",
     "toml": "^3.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.10",
-    "@types/node": "^22.19.3"
+    "@types/node": "^22.19.3",
+    "sharp": "^0.34.5"
   }
 }

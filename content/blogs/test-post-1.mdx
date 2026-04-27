@@ -1,0 +1,45 @@
+---
+title: Test Post 1
+description: First Post Desc
+date: "2023-12-12"
+categories:
+  - sveltekit
+  - svelte
+published: false
+featured: false
+---
+
+import Counter from "@/components/react/Counter";
+
+## Markdown
+
+Hello World
+
+```ts
+const Message = () => (
+  <p>Hello World</p>
+)
+
+function greet(name: string) {
+	console.log(`Hey ${name}!`);
+}
+```
+
+### Table of Contents
+
+## React
+
+**Image lazy load Example**
+
+## Interactive Counter
+
+Here's an example of an interactive React component (used in development to test React integration):
+
+```tsx
+// Components can be imported and used in MDX files
+// import Counter from "../../components/react/Counter";
+```
+
+<Counter client:load initialCount={0} />
+To use React components in MDX, import them at the top of the file and use them
+with `client:load` for interactive components.

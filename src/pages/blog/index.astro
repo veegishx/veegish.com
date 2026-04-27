@@ -3,7 +3,7 @@ import { getCollection } from "astro:content";
 import ArticleSnippet from "../../components/ArticleSnippet.astro";
 import Section from "../../components/common/Section.astro";
 import Layout from "../../layouts/Layout.astro";
-import { getConfigurationCollection } from "../../lib/utils";
+import { getConfigurationCollection, calculateReadingTime } from "../../lib/utils";
 
 const articles = (await getCollection("blog")).sort(
 	(a, b) => b.data.timestamp.valueOf() - a.data.timestamp.valueOf(),
@@ -45,10 +45,24 @@ const { data: config } = await getConfigurationCollection();
     <link rel="canonical" href={`${config.site.baseUrl}/blog`} />
   </Fragment>
   <Section class="my-8">
-    <div class="flex items-center gap-4 pt-8 pb-16">
+    <div class="flex items-center justify-between pt-8 pb-16">
       <h1 class="font-display text-3xl sm:text-4xl leading-loose">
         {config.texts.articlesName}
       </h1>
+      <a
+        href="/graph"
+        class="inline-flex items-center gap-2 px-3 py-2 text-sm bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg transition-colors"
+        title="View knowledge graph"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/>
+          <circle cx="6" cy="12" r="3"/>
+          <circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+        Graph
+      </a>
     </div>
     <ul>
       {
@@ -57,7 +71,7 @@ const { data: config } = await getConfigurationCollection();
             <ArticleSnippet
               title={article.data.title}
               description={article.data.description}
-              duration={`${article.data.readTime} min`}
+              duration={`${calculateReadingTime(article.body)} min`}
               url={`/blog/${article.data.slug}`}
               timestamp={article.data.timestamp}
             />

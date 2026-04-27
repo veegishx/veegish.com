@@ -1,6 +1,8 @@
 ---
 import Section from "../components/common/Section.astro";
 import Prose from "../components/Prose.astro";
+import Backlinks from "../components/Backlinks.astro";
+import BacklinksSidebar from "../components/BacklinksSidebar.astro";
 import type { ArticleFrontmatter } from "../lib/types";
 import { getConfigurationCollection, processArticleDate } from "../lib/utils";
 import Layout from "./Layout.astro";
@@ -71,6 +73,8 @@ const { data: config } = await getConfigurationCollection();
     <Prose>
       <slot />
     </Prose>
+    <Backlinks slug={frontmatter.slug} />
     <p class="pt-8">~{config.personal.name}</p>
   </Section>
+  <BacklinksSidebar slug={frontmatter.slug} />
 </Layout>

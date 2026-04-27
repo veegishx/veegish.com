@@ -1,11 +1,13 @@
 import { type CollectionEntry, getCollection } from "astro:content";
 
-/**
- * Shortens a string by removing words at the end until it fits within a certain length.
- * @param content the content to shorten
- * @param maxLength the maximum length of the shortened content (default is 20)
- * @returns a shortened version of the content
- */
+export const READING_WPM = 180;
+
+export const calculateReadingTime = (content: string | undefined): number => {
+	if (!content) return 0;
+	const wordCount = content.split(/\s+/).filter(Boolean).length;
+	return Math.ceil(wordCount / READING_WPM);
+};
+
 export const getShortDescription = (content: string, maxLength = 20) => {
   const splitByWord = content.split(" ");
   const length = splitByWord.length;

@@ -20,6 +20,7 @@ const featuredArticles = (
 ).map((e) => ({
 	...e.data,
   url: `/blog/${e.data.slug}`,
+  body: e.body,
 }));
 ---
 
@@ -58,9 +59,9 @@ const featuredArticles = (
   <Section class="my-16">
     <Hero />
   </Section>
-  <Section>
+  <!-- <Section>
     <FeaturedProjects featuredProjects={featuredProjects} />
-  </Section>
+  </Section> -->
   <Section>
     <FeaturedArticles featuredArticles={featuredArticles} />
   </Section>

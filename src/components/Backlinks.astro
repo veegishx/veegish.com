@@ -1,0 +1,35 @@
+---
+import { getBacklinksForPost } from "../lib/backlinks";
+
+type Props = {
+	slug: string;
+};
+
+const { slug } = Astro.props;
+const backlinks = await getBacklinksForPost(slug);
+---
+
+{backlinks.length > 0 && (
+	<div class="backlinks mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-800">
+		<h2 class="text-xl font-display mb-4">
+			Backlinks ({backlinks.length})
+		</h2>
+		<ul class="space-y-2">
+			{backlinks.map((link) => (
+				<li>
+					<a
+						href={link.url}
+						class="inline-flex flex-col gap-1 group"
+					>
+						<span class="text-sm font-medium group-hover:underline">
+							{link.title}
+						</span>
+						<span class="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-1">
+							{link.description}
+						</span>
+					</a>
+				</li>
+			))}
+		</ul>
+	</div>
+)}

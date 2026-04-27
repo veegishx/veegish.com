@@ -1,0 +1,18 @@
+---
+---
+
+<span id="counter-value">0</span>
+<button id="counter-increment">Increment</button>
+
+<script>
+  const counterValue = document.getElementById("counter-value");
+  const counterIncrement = document.getElementById("counter-increment");
+
+  if (counterValue && counterIncrement) {
+    let count = 0;
+    counterIncrement.addEventListener("click", () => {
+      count += 1;
+      counterValue.textContent = count.toString();
+    });
+  }
+</script>

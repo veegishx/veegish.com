@@ -1,0 +1,108 @@
+---
+import { getBacklinksForPost } from "../lib/backlinks";
+
+type Props = {
+	slug: string;
+};
+
+const { slug } = Astro.props;
+const backlinks = await getBacklinksForPost(slug);
+---
+
+<button
+	id="backlinks-toggle"
+	class="fixed right-0 top-1/2 -translate-y-1/2 z-50 bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-l-lg px-2 py-4 opacity-50 hover:opacity-100 transition-opacity"
+	aria-label="Toggle backlinks sidebar"
+>
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		width="20"
+		height="20"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		stroke-width="2"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		class="rotate-180"
+	>
+		<path d="M15 18l-6-6 6-6" />
+	</svg>
+</button>
+
+<div
+	id="backlinks-sidebar"
+	class="fixed right-0 top-0 h-full w-72 bg-zinc-50 dark:bg-zinc-900 border-l border-zinc-300 dark:border-zinc-700 transform translate-x-full transition-transform duration-300 z-40 overflow-y-auto"
+>
+	<div class="p-4">
+		<div class="flex items-center justify-between mb-4">
+			<h2 class="text-lg font-display">Backlinks</h2>
+			<button
+				id="backlinks-close"
+				class="p-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded"
+				aria-label="Close sidebar"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="20"
+					height="20"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				>
+					<path d="M18 6L6 18M6 6l12 12" />
+				</svg>
+			</button>
+		</div>
+
+		{backlinks.length === 0 ? (
+			<p class="text-sm text-zinc-500 dark:text-zinc-400">
+				No backlinks yet.
+			</p>
+		) : (
+			<ul class="space-y-3">
+				{backlinks.map((link) => (
+					<li>
+						<a
+							href={link.url}
+							class="block p-3 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+						>
+							<span class="text-sm font-medium block mb-1">
+								{link.title}
+							</span>
+							<span class="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2">
+								{link.description}
+							</span>
+						</a>
+					</li>
+				))}
+			</ul>
+		)}
+	</div>
+</div>
+
+<script>
+	const toggle = document.getElementById("backlinks-toggle");
+	const sidebar = document.getElementById("backlinks-sidebar");
+	const close = document.getElementById("backlinks-close");
+
+	function openSidebar() {
+		sidebar?.classList.remove("translate-x-full");
+	}
+
+	function closeSidebar() {
+		sidebar?.classList.add("translate-x-full");
+	}
+
+	toggle?.addEventListener("click", openSidebar);
+	close?.addEventListener("click", closeSidebar);
+
+	document.addEventListener("keydown", (e) => {
+		if (e.key === "Escape") {
+			closeSidebar();
+		}
+	});
+</script>
