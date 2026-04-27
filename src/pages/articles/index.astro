@@ -72,7 +72,7 @@ const { data: config } = await getConfigurationCollection();
               title={article.data.title}
               description={article.data.description}
               duration={`${calculateReadingTime(article.body)} min`}
-              url={`/blog/${article.data.slug}`}
+              url={`/${article.data.slug}`}
               timestamp={article.data.timestamp}
             />
           </li>

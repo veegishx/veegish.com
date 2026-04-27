@@ -117,7 +117,7 @@ async function buildBacklinkCache(): Promise<void> {
 						slug: entrySlug,
 						title: entry.data.title,
 						description: entry.data.description,
-						url: `/${entry.collection}/${entrySlug}`,
+						url: entry.collection === "blog" ? `/${entrySlug}` : `/projects/${entrySlug}`,
 						collection: entry.collection,
 					});
 				}
