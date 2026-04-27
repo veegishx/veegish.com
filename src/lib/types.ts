@@ -1,7 +1,8 @@
 import type { CollectionEntry } from "astro:content";
 
 export type ArticleFrontmatter = CollectionEntry<"blog">["data"] & {
-  url: string;
+	url: string;
+	updatedAt: Date;
 };
 
 export type ProjectFrontmatter = CollectionEntry<"project">["data"] & {

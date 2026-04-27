@@ -311,6 +311,11 @@ const blog = defineCollection({
        * The timestamp of the blog post, used for sorting and displaying the date.
        */
       date: z.coerce.date(),
+
+      /**
+       * The last update timestamp of the blog post. Defaults to date if not provided.
+       */
+      updatedAt: z.coerce.date().optional(),
     })
     .transform((data) => {
       const slug =
@@ -324,6 +329,7 @@ const blog = defineCollection({
         slug,
         tags: data.tags ?? data.categories,
         timestamp: data.date,
+        updatedAt: data.updatedAt ?? data.date,
       };
       return newData;
     }),

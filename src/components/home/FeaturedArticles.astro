@@ -10,6 +10,10 @@ type Props = {
 
 const { featuredArticles } = Astro.props;
 const { data: config } = await getConfigurationCollection();
+
+const sortedArticles = featuredArticles.sort(
+	(a, b) => b.updatedAt.valueOf() - a.updatedAt.valueOf()
+);
 ---
 
 <div class="flex justify-between items-center w-full">
@@ -18,8 +22,8 @@ const { data: config } = await getConfigurationCollection();
 </div>
 <ul class="my-8">
   {
-    (featuredArticles.length === 0 && <p>{config.texts.noArticles}</p>) ||
-      featuredArticles.map((article) => (
+    (sortedArticles.length === 0 && <p>{config.texts.noArticles}</p>) ||
+      sortedArticles.map((article) => (
         <li>
           <ArticleSnippet
             title={article.title}
