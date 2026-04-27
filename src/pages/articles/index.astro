@@ -30,7 +30,7 @@ const { data: config } = await getConfigurationCollection();
     {config.blogMeta.cardImage && (
       <meta property="og:image" content={config.blogMeta.cardImage} />
     )}
-    <meta property="og:url" content={`${config.site.baseUrl}/blog`} />
+    <meta property="og:url" content={`${config.site.baseUrl}`} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={config.blogMeta.title} />
     <meta
@@ -42,7 +42,7 @@ const { data: config } = await getConfigurationCollection();
     )}
     <meta http-equiv="content-language" content="en" />
     <meta name="language" content="English" />
-    <link rel="canonical" href={`${config.site.baseUrl}/blog`} />
+    <link rel="canonical" href={`${config.site.baseUrl}`} />
   </Fragment>
   <Section class="my-8">
     <div class="flex items-center justify-between pt-8 pb-16">

@@ -153,7 +153,8 @@ export default function Graph({ className = "" }: GraphProps) {
 				setHoveredNode(null);
 			})
 			.on("click", (_, d) => {
-				window.location.href = `/${d.collection}/${d.id}`;
+				const path = d.collection === "blog" ? `/${d.id}` : `/${d.collection}/${d.id}`;
+				window.location.href = path;
 			});
 
 		simulation.on("tick", () => {
