@@ -67,34 +67,61 @@ const { data: config } = await getConfigurationCollection();
   </nav>
 </header>
 
-<script>
-  const button = document.querySelector("button") as HTMLButtonElement;
-  const nav = document.querySelector("nav") as HTMLElement;
-  let isOpen = false;
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const icon = document.querySelector(".gb-icon");
+    if (!icon) return;
 
-  function updateNavState() {
-    const isMobile = window.matchMedia("(max-width: 640px)").matches;
-    if (isMobile) {
-      nav.style.transform = isOpen ? "translateY(0)" : "translateY(-100%)";
-    } else {
-      nav.style.transform = "translateY(0)";
-      isOpen = false;
+    function triggerEffect() {
+      icon.classList.remove("glowing", "wiggling");
+      void icon.offsetWidth;
+      icon.classList.add("glowing", "wiggling");
+      setTimeout(() => icon.classList.remove("glowing", "wiggling"), 2000);
     }
-  }
 
-  function toggleNav() {
-    isOpen = !isOpen;
+    function scheduleNext() {
+      const delay = Math.random() * 15000;
+      setTimeout(() => {
+        triggerEffect();
+        scheduleNext();
+      }, delay);
+    }
+
+    triggerEffect();
+    scheduleNext();
+  });
+</script>
+
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const button = document.querySelector("button");
+    const nav = document.querySelector("nav");
+    let isOpen = false;
+
+    function updateNavState() {
+      const isMobile = window.matchMedia("(max-width: 640px)").matches;
+      if (isMobile) {
+        nav.style.transform = isOpen ? "translateY(0)" : "translateY(-100%)";
+      } else {
+        nav.style.transform = "translateY(0)";
+        isOpen = false;
+      }
+    }
+
+    function toggleNav() {
+      isOpen = !isOpen;
+      updateNavState();
+    }
+
+    button?.addEventListener("click", toggleNav);
+    window.addEventListener("resize", updateNavState);
+
     updateNavState();
-  }
-
-  button?.addEventListener("click", toggleNav);
-  window.addEventListener("resize", updateNavState);
-
-  updateNavState();
+  });
 </script>
 
 <style>
-  .gb-icon {
+.gb-icon {
     width: 32px;
     height: 32px;
     background-image: url("/guestbook.png");
@@ -102,6 +129,40 @@ const { data: config } = await getConfigurationCollection();
     background-size: 32px 32px;
     background-position: 0 0;
     image-rendering: pixelated;
+    position: relative;
+    overflow: visible;
+    box-shadow: 0 0 4px 1px rgba(239, 68, 68, 0.4);
+  }
+
+  @keyframes glow-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 4px 1px rgba(239, 68, 68, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 20px 6px rgba(239, 68, 68, 0.9), 0 0 40px 10px rgba(239, 68, 68, 0.5);
+    }
+  }
+
+  .gb-icon.glowing {
+    animation: glow-pulse 2s ease-in-out;
+  }
+
+  @keyframes wiggle {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(-5deg);
+    }
+    75% {
+      transform: rotate(5deg);
+    }
+  }
+
+  .gb-icon.wiggling {
+    animation: wiggle 0.3s ease-in-out;
   }
 
   @media (min-width: 640px) {
