@@ -35,7 +35,7 @@ const messages = res.rows.map((r) => ({
     <meta name="description" content="Leave a message in the guestbook." />
   </Fragment>
 
-  <Section class="my-16">
+  <Section class="my-12">
     <header class="mb-8" id="sprite-hover">
       <div class="flex flex-col md:flex-row items-center gap-4 pt-8 pb-8">
         <span class="guestbook-sprite inline-block flex-none" aria-hidden="true"
@@ -232,444 +232,448 @@ const messages = res.rows.map((r) => ({
       }
     </div>
   </Section>
+</Layout>
 
-  </script>
+<style>
+  :root {
+    --guestbook-size: 64px;
+    --guestbook-frames: 52;
+  }
 
-  <style>
+  @media (min-width: 640px) {
     :root {
-      --guestbook-size: 64px;
-      --guestbook-frames: 52;
+      --guestbook-size: 80px;
     }
+  }
 
-    @media (min-width: 640px) {
-      :root {
-        --guestbook-size: 80px;
-      }
+  @media (min-width: 768px) {
+    :root {
+      --guestbook-size: 96px;
     }
+  }
 
-    @media (min-width: 768px) {
-      :root {
-        --guestbook-size: 96px;
-      }
-    }
+  .guestbook-sprite {
+    width: var(--guestbook-size);
+    height: var(--guestbook-size);
+    background-image: url("/guestbookspritesheet.png");
+    background-repeat: no-repeat;
+    background-size: calc(var(--guestbook-size) * var(--guestbook-frames))
+      var(--guestbook-size);
+    background-position: 0 0;
+    image-rendering: pixelated;
+  }
 
-    .guestbook-sprite {
-      width: var(--guestbook-size);
-      height: var(--guestbook-size);
-      background-image: url("/guestbookspritesheet.png");
-      background-repeat: no-repeat;
-      background-size: calc(var(--guestbook-size) * var(--guestbook-frames))
-        var(--guestbook-size);
+  #sprite-hover:hover .guestbook-sprite {
+    animation: guestbook-walk 3s steps(var(--guestbook-frames)) infinite;
+    animation-delay: 1s;
+  }
+
+  @keyframes guestbook-walk {
+    from {
       background-position: 0 0;
-      image-rendering: pixelated;
     }
+    to {
+      background-position: calc(
+          -1 * var(--guestbook-size) * var(--guestbook-frames)
+        )
+        0;
+    }
+  }
 
+  @media (prefers-reduced-motion: reduce) {
     #sprite-hover:hover .guestbook-sprite {
-      animation: guestbook-walk 3s steps(var(--guestbook-frames)) infinite;
-      animation-delay: 1s;
+      animation: none;
     }
-
-    @keyframes guestbook-walk {
-      from {
-        background-position: 0 0;
-      }
-      to {
-        background-position: calc(
-            -1 * var(--guestbook-size) * var(--guestbook-frames)
-          )
-          0;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      #sprite-hover:hover .guestbook-sprite {
-        animation: none;
-      }
-      #sprite-hover:hover .gb-hover-text {
-        animation: none;
-        opacity: 1;
-        transform: translateY(-50%);
-      }
-      #sprite-hover:hover .gb-strike-text {
-        animation: none;
-        text-decoration: none;
-      }
-      #sprite-hover:hover .gb-pact-text {
-        animation: none;
-        opacity: 1;
-      }
-    }
-
-    .gb-hover-text {
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-100%);
-      opacity: 0;
-      font-family: var(--font-mono);
-      font-size: 0.875rem;
-      letter-spacing: 0.05em;
-      color: var(--color-zag-accent-dark);
-      pointer-events: none;
-      white-space: nowrap;
-      z-index: 0;
-    }
-
-    :where(.dark, .dark *) .gb-hover-text {
-      color: var(--color-zag-accent-light);
-    }
-
     #sprite-hover:hover .gb-hover-text {
-      animation: gb-hover-slide 0.8s ease-out forwards;
+      animation: none;
+      opacity: 1;
+      transform: translateY(-50%);
     }
-
     #sprite-hover:hover .gb-strike-text {
-      animation: gb-hover-strike 1.5s ease-in-out 1s forwards;
+      animation: none;
+      text-decoration: none;
     }
-
     #sprite-hover:hover .gb-pact-text {
-      animation: gb-pact-show 0.5s ease-in-out 1.5s forwards;
-    }
-
-    .gb-hover-text {
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-100%);
-      opacity: 0;
-      font-family: var(--font-mono);
-      font-size: 0.875rem;
-      letter-spacing: 0.05em;
-      color: var(--color-zag-accent-dark);
-      pointer-events: none;
-      white-space: nowrap;
-      z-index: 0;
-    }
-
-    .gb-pact-text {
-      color: #ef4444;
-      opacity: 0;
-      margin-left: 0.25rem;
-      display: inline-block;
-    }
-
-    :where(.dark, .dark *) .gb-hover-text {
-      color: var(--color-zag-accent-light);
-    }
-
-    .gb-strike-text {
-      display: inline-block;
-      text-decoration: none;
-    }
-
-    #sprite-hover:hover .gb-strike-text {
-      animation: gb-hover-strike 1.5s ease-in-out 1s forwards;
-    }
-
-    .gb-strike-text {
-      display: inline-block;
-      text-decoration: none;
-    }
-
-    @keyframes gb-hover-slide {
-      0% {
-        opacity: 0;
-        transform: translateY(-20%);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(120%);
-      }
-    }
-
-    @keyframes gb-hover-strike {
-      0% {
-        text-decoration: none;
-      }
-      100% {
-        text-decoration: line-through;
-        text-decoration-thickness: 2px;
-        text-decoration-color: currentColor;
-      }
-    }
-
-    @keyframes gb-pact-show {
-      0% {
-        opacity: 0;
-      }
-      100% {
-        opacity: 1;
-      }
-    }
-  </style>
-
-  <script is:inline>
-    (() => {
-      const h1 = document.querySelector("#sprite-hover h1");
-      if (!h1) return;
-
-      const audio = new Audio("/evil-sound-effect.mp3");
-      audio.loop = true;
-      let timeoutId = null;
-
-      h1.addEventListener("mouseenter", () => {
-        timeoutId = setTimeout(() => {
-          audio.currentTime = 0;
-          audio.play().catch(() => {});
-        }, 1000);
-      });
-
-      h1.addEventListener("mouseleave", () => {
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-          timeoutId = null;
-        }
-        audio.pause();
-        audio.currentTime = 0;
-      });
-    })();
-  </script>
-
-  <script is:inline>
-    (() => {
-      const root = document.getElementById("gb-entries");
-      if (!root) return;
-
-      const buttons = Array.from(root.querySelectorAll("[data-density-btn]"));
-      const normalize = (v) => (v === "compact" ? "compact" : "guestbook");
-
-      function safeGet(key) {
-        try {
-          return localStorage.getItem(key);
-        } catch {
-          return null;
-        }
-      }
-
-      function safeSet(key, value) {
-        try {
-          localStorage.setItem(key, value);
-        } catch {
-          // ignore
-        }
-      }
-
-      function apply(next) {
-        const density = normalize(next);
-        root.dataset.density = density;
-        for (const btn of buttons) {
-          const val = btn.getAttribute("data-density-btn");
-          const active = val === density;
-          btn.setAttribute("aria-pressed", active ? "true" : "false");
-          btn.classList.toggle("gb-toggle-active", active);
-        }
-      }
-
-      const saved = safeGet("guestbookDensity");
-      apply(saved);
-
-      for (const btn of buttons) {
-        btn.addEventListener("click", () => {
-          const next = btn.getAttribute("data-density-btn");
-          if (!next) return;
-          apply(next);
-          safeSet("guestbookDensity", normalize(next));
-        });
-      }
-    })();
-  </script>
-
-  <style>
-    .gb-panel {
-      border: var(--zag-stroke) solid;
-      border-color: var(--color-zag-dark);
-    }
-    :where(.dark, .dark *) .gb-panel {
-      border-color: var(--color-zag-light);
-    }
-    .gb-entry {
-      border: var(--zag-stroke) solid;
-      border-color: var(--color-zag-dark-muted);
-      position: relative;
-      min-width: 0;
-    }
-    :where(.dark, .dark *) .gb-entry {
-      border-color: var(--color-zag-light-muted);
-    }
-    .gb-entry::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      transition: opacity var(--zag-transition-duration)
-        var(--zag-transition-timing-function);
-      background:
-        linear-gradient(
-            90deg,
-            transparent 0 31px,
-            color-mix(in oklab, currentColor 6%, transparent) 31px 32px
-          )
-          0 0 / 32px 32px,
-        linear-gradient(
-            transparent 0 31px,
-            color-mix(in oklab, currentColor 6%, transparent) 31px 32px
-          )
-          0 0 / 32px 32px;
-      pointer-events: none;
-    }
-    .gb-entry:hover::before {
+      animation: none;
       opacity: 1;
     }
+  }
 
-    .gb-toggle-row {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-    }
-    .gb-toggle {
-      padding: 0.65rem 0.75rem;
-      border: var(--zag-stroke) solid;
-      border-color: var(--color-zag-dark);
-      background: transparent;
-      cursor: pointer;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      letter-spacing: 0.06em;
-      user-select: none;
-      text-transform: uppercase;
-    }
-    :where(.dark, .dark *) .gb-toggle {
-      border-color: var(--color-zag-light);
-    }
-    .gb-toggle-active {
-      background: var(--color-zag-dark);
-      color: var(--color-zag-light);
-    }
-    :where(.dark, .dark *) .gb-toggle-active {
-      background: var(--color-zag-light);
-      color: var(--color-zag-dark);
-    }
-
-    #gb-entries[data-density="compact"] .gb-list {
-      gap: 0.5rem;
-    }
-    #gb-entries[data-density="compact"] .gb-entry {
-      padding: 0.75rem;
-    }
-    #gb-entries[data-density="compact"] .gb-message {
-      margin-top: 0.5rem;
-      line-height: 1.35;
-    }
-    #gb-entries[data-density="compact"] .gb-ascii-divider {
+  @media (max-width: 639px) {
+    .gb-hover-text {
       display: none;
     }
+  }
 
-    .gb-url {
-      overflow-wrap: anywhere;
-      word-break: break-word;
-    }
-    .gb-input {
-      width: 100%;
-      padding: 0.75rem 0.875rem;
-      border: var(--zag-stroke) solid;
-      border-color: var(--color-zag-dark);
-      background-color: transparent;
-      outline: none;
-    }
-    :where(.dark, .dark *) .gb-input {
-      border-color: var(--color-zag-light);
-    }
-    .gb-input:focus {
-      border-color: var(--color-zag-accent-dark);
-      box-shadow: 0 0 0 2px
-        color-mix(in oklab, var(--color-zag-accent-dark) 30%, transparent);
-    }
-    :where(.dark, .dark *) .gb-input:focus {
-      border-color: var(--color-zag-accent-light);
-      box-shadow: 0 0 0 2px
-        color-mix(in oklab, var(--color-zag-accent-light) 30%, transparent);
-    }
-    .gb-button {
-      padding: 0.75rem 1rem;
-      border: var(--zag-stroke) solid;
-      border-color: var(--color-zag-dark);
-      background: var(--color-zag-light);
-      cursor: pointer;
-    }
-    :where(.dark, .dark *) .gb-button {
-      border-color: var(--color-zag-light);
-      background: var(--color-zag-dark);
-    }
-    .gb-button:hover {
-      transform: translateY(-1px);
-    }
-    .gb-ascii {
-      opacity: 0.8;
-      letter-spacing: 0.04em;
-      user-select: none;
-    }
+  .gb-hover-text {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-100%);
+    opacity: 0;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    color: var(--color-zag-accent-dark);
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 0;
+  }
 
-    /* Mobile-first: long ASCII lines can force horizontal overflow. */
-    .gb-ascii-divider {
-      display: none;
+  :where(.dark, .dark *) .gb-hover-text {
+    color: var(--color-zag-accent-light);
+  }
+
+  #sprite-hover:hover .gb-hover-text {
+    animation: gb-hover-slide 0.8s ease-out forwards;
+  }
+
+  #sprite-hover:hover .gb-strike-text {
+    animation: gb-hover-strike 1.5s ease-in-out 1s forwards;
+  }
+
+  #sprite-hover:hover .gb-pact-text {
+    animation: gb-pact-show 0.5s ease-in-out 1.5s forwards;
+  }
+
+  .gb-hover-text {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-100%);
+    opacity: 0;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    color: var(--color-zag-accent-dark);
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 0;
+  }
+
+  .gb-pact-text {
+    color: #ef4444;
+    opacity: 0;
+    margin-left: 0.25rem;
+    display: inline-block;
+  }
+
+  :where(.dark, .dark *) .gb-hover-text {
+    color: var(--color-zag-accent-light);
+  }
+
+  .gb-strike-text {
+    display: inline-block;
+    text-decoration: none;
+  }
+
+  #sprite-hover:hover .gb-strike-text {
+    animation: gb-hover-strike 1.5s ease-in-out 1s forwards;
+  }
+
+  .gb-strike-text {
+    display: inline-block;
+    text-decoration: none;
+  }
+
+  @keyframes gb-hover-slide {
+    0% {
+      opacity: 0;
+      transform: translateY(-20%);
     }
-    @media (min-width: 640px) {
-      .gb-ascii-divider {
-        display: block;
-        overflow: hidden;
-        white-space: nowrap;
+    100% {
+      opacity: 1;
+      transform: translateY(120%);
+    }
+  }
+
+  @keyframes gb-hover-strike {
+    0% {
+      text-decoration: none;
+    }
+    100% {
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+      text-decoration-color: currentColor;
+    }
+  }
+
+  @keyframes gb-pact-show {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const h1 = document.querySelector("#sprite-hover h1");
+    if (!h1) return;
+
+    const audio = new Audio("/evil-sound-effect.mp3");
+    audio.loop = true;
+    let timeoutId = null;
+
+    h1.addEventListener("mouseenter", () => {
+      timeoutId = setTimeout(() => {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+      }, 1000);
+    });
+
+    h1.addEventListener("mouseleave", () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+      audio.pause();
+      audio.currentTime = 0;
+    });
+  })();
+</script>
+
+<script is:inline>
+  (() => {
+    const root = document.getElementById("gb-entries");
+    if (!root) return;
+
+    const buttons = Array.from(root.querySelectorAll("[data-density-btn]"));
+    const normalize = (v) => (v === "compact" ? "compact" : "guestbook");
+
+    function safeGet(key) {
+      try {
+        return localStorage.getItem(key);
+      } catch {
+        return null;
       }
     }
-    .gb-name {
-      font-weight: 700;
-    }
-    .gb-link {
-      text-decoration: underline;
-      text-underline-offset: var(--zag-offset);
-    }
-    .gb-message {
-      white-space: pre-wrap;
-    }
-    .gb-banner {
-      border: var(--zag-stroke) solid;
-      border-color: var(--color-zag-accent-dark);
-      background: color-mix(
-        in oklab,
-        var(--color-zag-accent-dark) 10%,
-        transparent
-      );
-    }
-    :where(.dark, .dark *) .gb-banner {
-      border-color: var(--color-zag-accent-light);
-      background: color-mix(
-        in oklab,
-        var(--color-zag-accent-light) 12%,
-        transparent
-      );
+
+    function safeSet(key, value) {
+      try {
+        localStorage.setItem(key, value);
+      } catch {
+        // ignore
+      }
     }
 
-    .gb-banner-error {
-      border-color: var(--color-zag-dark-muted);
-      background: color-mix(
-        in oklab,
-        var(--color-zag-dark-muted) 10%,
-        transparent
-      );
+    function apply(next) {
+      const density = normalize(next);
+      root.dataset.density = density;
+      for (const btn of buttons) {
+        const val = btn.getAttribute("data-density-btn");
+        const active = val === density;
+        btn.setAttribute("aria-pressed", active ? "true" : "false");
+        btn.classList.toggle("gb-toggle-active", active);
+      }
     }
-    :where(.dark, .dark *) .gb-banner-error {
-      border-color: var(--color-zag-light-muted);
-      background: color-mix(
-        in oklab,
-        var(--color-zag-light-muted) 12%,
-        transparent
-      );
+
+    const saved = safeGet("guestbookDensity");
+    apply(saved);
+
+    for (const btn of buttons) {
+      btn.addEventListener("click", () => {
+        const next = btn.getAttribute("data-density-btn");
+        if (!next) return;
+        apply(next);
+        safeSet("guestbookDensity", normalize(next));
+      });
     }
-    .gb-hp {
-      position: absolute;
-      left: -9999px;
-      width: 1px;
-      height: 1px;
+  })();
+</script>
+
+<style>
+  .gb-panel {
+    border: var(--zag-stroke) solid;
+    border-color: var(--color-zag-dark);
+  }
+  :where(.dark, .dark *) .gb-panel {
+    border-color: var(--color-zag-light);
+  }
+  .gb-entry {
+    border: var(--zag-stroke) solid;
+    border-color: var(--color-zag-dark-muted);
+    position: relative;
+    min-width: 0;
+  }
+  :where(.dark, .dark *) .gb-entry {
+    border-color: var(--color-zag-light-muted);
+  }
+  .gb-entry::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity var(--zag-transition-duration)
+      var(--zag-transition-timing-function);
+    background:
+      linear-gradient(
+          90deg,
+          transparent 0 31px,
+          color-mix(in oklab, currentColor 6%, transparent) 31px 32px
+        )
+        0 0 / 32px 32px,
+      linear-gradient(
+          transparent 0 31px,
+          color-mix(in oklab, currentColor 6%, transparent) 31px 32px
+        )
+        0 0 / 32px 32px;
+    pointer-events: none;
+  }
+  .gb-entry:hover::before {
+    opacity: 1;
+  }
+
+  .gb-toggle-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  .gb-toggle {
+    padding: 0.65rem 0.75rem;
+    border: var(--zag-stroke) solid;
+    border-color: var(--color-zag-dark);
+    background: transparent;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    user-select: none;
+    text-transform: uppercase;
+  }
+  :where(.dark, .dark *) .gb-toggle {
+    border-color: var(--color-zag-light);
+  }
+  .gb-toggle-active {
+    background: var(--color-zag-dark);
+    color: var(--color-zag-light);
+  }
+  :where(.dark, .dark *) .gb-toggle-active {
+    background: var(--color-zag-light);
+    color: var(--color-zag-dark);
+  }
+
+  #gb-entries[data-density="compact"] .gb-list {
+    gap: 0.5rem;
+  }
+  #gb-entries[data-density="compact"] .gb-entry {
+    padding: 0.75rem;
+  }
+  #gb-entries[data-density="compact"] .gb-message {
+    margin-top: 0.5rem;
+    line-height: 1.35;
+  }
+  #gb-entries[data-density="compact"] .gb-ascii-divider {
+    display: none;
+  }
+
+  .gb-url {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  .gb-input {
+    width: 100%;
+    padding: 0.75rem 0.875rem;
+    border: var(--zag-stroke) solid;
+    border-color: var(--color-zag-dark);
+    background-color: transparent;
+    outline: none;
+  }
+  :where(.dark, .dark *) .gb-input {
+    border-color: var(--color-zag-light);
+  }
+  .gb-input:focus {
+    border-color: var(--color-zag-accent-dark);
+    box-shadow: 0 0 0 2px
+      color-mix(in oklab, var(--color-zag-accent-dark) 30%, transparent);
+  }
+  :where(.dark, .dark *) .gb-input:focus {
+    border-color: var(--color-zag-accent-light);
+    box-shadow: 0 0 0 2px
+      color-mix(in oklab, var(--color-zag-accent-light) 30%, transparent);
+  }
+  .gb-button {
+    padding: 0.75rem 1rem;
+    border: var(--zag-stroke) solid;
+    border-color: var(--color-zag-dark);
+    background: var(--color-zag-light);
+    cursor: pointer;
+  }
+  :where(.dark, .dark *) .gb-button {
+    border-color: var(--color-zag-light);
+    background: var(--color-zag-dark);
+  }
+  .gb-button:hover {
+    transform: translateY(-1px);
+  }
+  .gb-ascii {
+    opacity: 0.8;
+    letter-spacing: 0.04em;
+    user-select: none;
+  }
+
+  /* Mobile-first: long ASCII lines can force horizontal overflow. */
+  .gb-ascii-divider {
+    display: none;
+  }
+  @media (min-width: 640px) {
+    .gb-ascii-divider {
+      display: block;
       overflow: hidden;
+      white-space: nowrap;
     }
-  </style>
-</Layout>
+  }
+  .gb-name {
+    font-weight: 700;
+  }
+  .gb-link {
+    text-decoration: underline;
+    text-underline-offset: var(--zag-offset);
+  }
+  .gb-message {
+    white-space: pre-wrap;
+  }
+  .gb-banner {
+    border: var(--zag-stroke) solid;
+    border-color: var(--color-zag-accent-dark);
+    background: color-mix(
+      in oklab,
+      var(--color-zag-accent-dark) 10%,
+      transparent
+    );
+  }
+  :where(.dark, .dark *) .gb-banner {
+    border-color: var(--color-zag-accent-light);
+    background: color-mix(
+      in oklab,
+      var(--color-zag-accent-light) 12%,
+      transparent
+    );
+  }
+
+  .gb-banner-error {
+    border-color: var(--color-zag-dark-muted);
+    background: color-mix(
+      in oklab,
+      var(--color-zag-dark-muted) 10%,
+      transparent
+    );
+  }
+  :where(.dark, .dark *) .gb-banner-error {
+    border-color: var(--color-zag-light-muted);
+    background: color-mix(
+      in oklab,
+      var(--color-zag-light-muted) 12%,
+      transparent
+    );
+  }
+  .gb-hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+</style>
