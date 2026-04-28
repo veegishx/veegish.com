@@ -12,9 +12,12 @@ const backlinks = await getBacklinksForPost(slug);
 
 {backlinks.length > 0 && (
 	<div class="backlinks mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-800">
-		<h2 class="text-xl font-display mb-4">
-			Backlinks ({backlinks.length})
-		</h2>
+		<div class="flex items-center gap-3 mb-4" id="sprite-hover">
+			<span class="backlink-sprite inline-block flex-none" aria-hidden="true"></span>
+			<h2 class="text-xl font-display">
+				Backlinks ({backlinks.length})
+			</h2>
+		</div>
 		<ul class="space-y-2">
 			{backlinks.map((link) => (
 				<li>
@@ -34,3 +37,46 @@ const backlinks = await getBacklinksForPost(slug);
 		</ul>
 	</div>
 )}
+
+<style>
+	:root {
+		--backlink-size: 32px;
+		--backlink-frames: 15;
+	}
+
+	@media (min-width: 640px) {
+		:root {
+			--backlink-size: 40px;
+		}
+	}
+
+	.backlink-sprite {
+		width: var(--backlink-size);
+		height: var(--backlink-size);
+		background-image: url("/backlinksprite.png");
+		background-repeat: no-repeat;
+		background-size: calc(var(--backlink-size) * var(--backlink-frames)) var(--backlink-size);
+		background-position: 0 0;
+		image-rendering: pixelated;
+		flex-shrink: 0;
+	}
+
+	#sprite-hover:hover .backlink-sprite {
+		animation: backlink-walk 1.5s steps(var(--backlink-frames)) infinite;
+	}
+
+	@keyframes backlink-walk {
+		from {
+			background-position: 0 0;
+		}
+		to {
+			background-position: calc(-1 * var(--backlink-size) * var(--backlink-frames)) 0;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		#sprite-hover:hover .backlink-sprite {
+			animation: none;
+		}
+	}
+</style>
