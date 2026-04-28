@@ -148,10 +148,11 @@ export function getEventDescription(event: GitHubEvent): string {
 	const repoName = event.repo.name.split("/")[1] || event.repo.name;
 
 	switch (event.type) {
-		case "PushEvent":
+		case "PushEvent": {
 			const commitCount = event.payload.commits?.length || 0;
 			const verb = commitCount === 1 ? "pushed" : "pushed";
 			return `${verb} ${commitCount} commit${commitCount !== 1 ? "s" : ""} to ${repoName}`;
+		}
 
 		case "CreateEvent":
 			return `created a branch in ${repoName}`;
@@ -159,17 +160,20 @@ export function getEventDescription(event: GitHubEvent): string {
 		case "DeleteEvent":
 			return `deleted a branch in ${repoName}`;
 
-		case "IssuesEvent":
+		case "IssuesEvent": {
 			const issueAction = event.payload.action === "opened" ? "opened" : event.payload.action;
 			return `${issueAction} issue in ${repoName}`;
+		}
 
-		case "IssueCommentEvent":
+		case "IssueCommentEvent": {
 			const commentAction = event.payload.action === "created" ? "commented on" : event.payload.action;
 			return `${commentAction} issue in ${repoName}`;
+		}
 
-		case "PullRequestEvent":
+		case "PullRequestEvent": {
 			const prAction = event.payload.action === "opened" ? "opened" : event.payload.action;
 			return `${prAction} PR in ${repoName}`;
+		}
 
 		case "PullRequestReviewEvent":
 			return `reviewed a PR in ${repoName}`;
