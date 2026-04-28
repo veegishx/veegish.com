@@ -1,16 +1,15 @@
 ---
-
 import Section from "../components/common/Section.astro";
 import Prose from "../components/Prose.astro";
 import Backlinks from "../components/Backlinks.astro";
 import BacklinksSidebar from "../components/BacklinksSidebar.astro";
 import type { ArticleFrontmatter } from "../lib/types";
-import { getConfigurationCollection, processArticleDate } from "../lib/utils";
+import { getConfigurationCollection, processArticleDate, calculateReadingTime } from "../lib/utils";
 import Layout from "./Layout.astro";
 
-type Props = { frontmatter: ArticleFrontmatter };
+type Props = { frontmatter: ArticleFrontmatter; body?: string };
 
-const { frontmatter } = Astro.props;
+const { frontmatter, body } = Astro.props;
 const articleDate = processArticleDate(frontmatter.timestamp);
 const { data: config } = await getConfigurationCollection();
 ---
@@ -68,7 +67,7 @@ const { data: config } = await getConfigurationCollection();
       </h1>
       <div class="flex justify-between">
         <span>{articleDate}</span>
-        <span>{frontmatter.readTime} min</span>
+        <span>{body ? `${calculateReadingTime(body)} min` : `${frontmatter.readTime} min`}</span>
       </div>
     </div>
     <Prose>
