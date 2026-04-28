@@ -8,9 +8,9 @@ const { data: config } = await getConfigurationCollection();
 
 <header class="zag-bg zag-border-b zag-transition sticky top-0 w-full z-10">
   <div
-    class="zag-bg zag-transition sm:hidden relative z-50 py-4 flex items-center"
+    class="zag-bg zag-transition sm:hidden relative z-50 px-4 py-4 flex items-center justify-between w-full"
   >
-    <button class="px-4" type="button" aria-label="Toggle navigation menu">
+    <button class="flex items-center" type="button" aria-label="Toggle navigation menu">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="32"
@@ -22,6 +22,14 @@ const { data: config } = await getConfigurationCollection();
         <path d="M80 96h352v32H80zm0 144h352v32H80zm0 144h352v32H80z"></path>
       </svg>
     </button>
+    <div class="flex items-center gap-4">
+      <Anchor url="/guestbook" aria-label="Sign the guestbook" class="flex items-center">
+        <span class="gb-icon inline-block" aria-hidden="true" />
+      </Anchor>
+      <span class="flex items-center">
+        <ThemeToggle />
+      </span>
+    </div>
   </div>
   <nav
     class="zag-bg zag-border-b zag-transition fixed sm:relative inset-x-0 top-0 h-auto sm:px-4 flex justify-between flex-col gap-8 py-4 text-xl sm:flex-row max-w-2xl mx-auto sm:pt-4 sm:border-none"
@@ -35,10 +43,10 @@ const { data: config } = await getConfigurationCollection();
         ))
       }
     </div>
-    <div class="flex gap-4 justify-between px-4 sm:px-0" title="guestbook">
+    <div class="flex items-center gap-4 justify-between px-4 sm:px-0" title="guestbook">
       {
         (
-          <Anchor url="/guestbook" aria-label="Sign the guestbook">
+          <Anchor url="/guestbook" aria-label="Sign the guestbook" class="hidden sm:inline-flex sm:items-center">
             <span class="gb-icon inline-block" aria-hidden="true" />
           </Anchor>
         )
@@ -62,17 +70,19 @@ const { data: config } = await getConfigurationCollection();
           </Anchor>
         )
       }
-      <ThemeToggle />
+      <div class="hidden sm:block">
+        <ThemeToggle />
+      </div>
     </div>
   </nav>
 </header>
 
 <script is:inline>
   document.addEventListener("DOMContentLoaded", () => {
-    const icon = document.querySelector(".gb-icon");
-    if (!icon) return;
+    const icons = document.querySelectorAll(".gb-icon");
+    if (icons.length === 0) return;
 
-    function triggerEffect() {
+    function triggerEffect(icon) {
       icon.classList.remove("glowing", "wiggling");
       void icon.offsetWidth;
       icon.classList.add("glowing", "wiggling");
@@ -82,12 +92,12 @@ const { data: config } = await getConfigurationCollection();
     function scheduleNext() {
       const delay = Math.random() * 15000;
       setTimeout(() => {
-        triggerEffect();
+        icons.forEach(triggerEffect);
         scheduleNext();
       }, delay);
     }
 
-    triggerEffect();
+    icons.forEach(triggerEffect);
     scheduleNext();
   });
 </script>
@@ -121,7 +131,7 @@ const { data: config } = await getConfigurationCollection();
 </script>
 
 <style>
-.gb-icon {
+  .gb-icon {
     width: 32px;
     height: 32px;
     background-image: url("/guestbook.png");
