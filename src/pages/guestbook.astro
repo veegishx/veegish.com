@@ -161,11 +161,12 @@ const messages = res.rows.map((r) => ({
       <div
         class="flex flex-col gap-3 sm:flex-row items-baseline md:items-center justify-between sm:gap-4 mb-4"
       >
-        <div class="w-full flex items-baseline justify-between gap-4">
+        <div class="w-full flex items-baseline justify-between gap-4 relative">
           <p class="font-display text-lg leading-0">ENTRIES</p>
           <p class="gb-ascii font-mono text-xs sm:text-sm leading-0">
             [ SANTA WAS HERE ]
           </p>
+          <span class="text-[10px] absolute -bottom-6 right-0">allegedly</span>
         </div>
 
         <div class="gb-toggle-row" aria-label="Entries density">
@@ -232,34 +233,6 @@ const messages = res.rows.map((r) => ({
     </div>
   </Section>
 
-  <script>
-    const headingBlock = document.getElementById("sprite-hover");
-    const heading = headingBlock?.querySelector("h1");
-    const sprite = heading?.querySelector("span");
-
-    if (heading && sprite) {
-      let interval: string | number | NodeJS.Timeout | null | undefined = null;
-      const totalFrames = 52;
-      const frameWidth = 32;
-      const frameDelay = 80;
-
-      heading.addEventListener("mouseenter", () => {
-        if (interval) clearInterval(interval);
-
-        let frame = 0;
-        interval = setInterval(() => {
-          frame = (frame + 1) % totalFrames;
-          const offset = -frame * frameWidth;
-          sprite.style.backgroundPosition = `${offset}px 0px`;
-        }, frameDelay);
-      });
-
-      heading.addEventListener("mouseleave", () => {
-        if (interval) clearInterval(interval);
-        interval = null;
-        sprite.style.backgroundPosition = "0px 0px";
-      });
-    }
   </script>
 
   <style>
