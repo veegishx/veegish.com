@@ -1,5 +1,4 @@
 ---
-
 import Layout from "../layouts/Layout.astro";
 import Section from "../components/common/Section.astro";
 import { getGuestbookDb } from "../lib/guestbook/db";
@@ -7,26 +6,26 @@ import { getGuestbookDb } from "../lib/guestbook/db";
 export const prerender = false;
 
 function toUtcDateString(ms: number): string {
-	const d = new Date(ms);
-	const y = d.getUTCFullYear();
-	const m = String(d.getUTCMonth() + 1).padStart(2, "0");
-	const day = String(d.getUTCDate()).padStart(2, "0");
-	return `${y}-${m}-${day}`;
+  const d = new Date(ms);
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
 }
 
 const signed = Astro.url.searchParams.get("signed") === "1";
 const error = Astro.url.searchParams.get("error") ?? "";
 const db = getGuestbookDb();
 const res = await db.execute({
-	sql: "SELECT id, name, message, website, created_at FROM guestbook_messages ORDER BY created_at DESC LIMIT 50",
-	args: [],
+  sql: "SELECT id, name, message, website, created_at FROM guestbook_messages ORDER BY created_at DESC LIMIT 50",
+  args: [],
 });
 const messages = res.rows.map((r) => ({
-	id: String(r.id),
-	name: String(r.name),
-	message: String(r.message),
-	website: r.website ? String(r.website) : undefined,
-	createdAt: Number(r.created_at),
+  id: String(r.id),
+  name: String(r.name),
+  message: String(r.message),
+  website: r.website ? String(r.website) : undefined,
+  createdAt: Number(r.created_at),
 }));
 ---
 
@@ -37,24 +36,40 @@ const messages = res.rows.map((r) => ({
   </Fragment>
 
   <Section class="my-16">
-    <header class="mb-8">
-      <p class="font-display text-2xl sm:text-3xl tracking-tight">GUESTBOOK</p>
-      <p class="zag-muted mt-3 text-base leading-relaxed">
+    <header class="mb-8" id="sprite-hover">
+      <div class="flex flex-col md:flex-row items-center gap-4 pt-8 pb-8">
+        <span class="guestbook-sprite inline-block flex-none" aria-hidden="true"
+        ></span>
+        <div
+          class="w-full flex flex-col items-center md:items-start md:flex-row md:justify-between gap-2"
+        >
+          <h1
+            class="font-display text-2xl sm:text-3xl tracking-tight flex flex-wrap items-center gap-2"
+          >
+            GUESTBOOK
+          </h1>
+        </div>
+      </div>
+      <p class="zag-muted mt-0 md:mt-0 text-base leading-relaxed">
         Like it's 1999. Leave a note, a link, a memory.
       </p>
     </header>
 
-    {signed && (
-      <div class="gb-banner mb-6 p-4">
-        <p class="font-mono text-sm">Entry logged. Thanks for signing.</p>
-      </div>
-    )}
+    {
+      signed && (
+        <div class="gb-banner mb-6 p-4">
+          <p class="font-mono text-sm">Entry logged. Thanks for signing.</p>
+        </div>
+      )
+    }
 
-    {error && (
-      <div class="gb-banner gb-banner-error mb-6 p-4">
-        <p class="font-mono text-sm">{error}</p>
-      </div>
-    )}
+    {
+      error && (
+        <div class="gb-banner gb-banner-error mb-6 p-4">
+          <p class="font-mono text-sm">{error}</p>
+        </div>
+      )
+    }
 
     <div class="gb-panel p-4 sm:p-6">
       <div class="flex items-baseline justify-between gap-4">
@@ -90,8 +105,7 @@ const messages = res.rows.map((r) => ({
             maxlength="1000"
             rows={5}
             class="gb-input font-mono"
-            placeholder="Say hello..."
-          ></textarea>
+            placeholder="Say hello..."></textarea>
         </label>
 
         <div class="grid gap-4 sm:grid-cols-2">
@@ -106,7 +120,9 @@ const messages = res.rows.map((r) => ({
           </label>
 
           <label class="grid gap-2 relative">
-            <span class="font-mono text-sm">Email (optional, not displayed)</span>
+            <span class="font-mono text-sm"
+              >Email (optional, not displayed)</span
+            >
             <input
               name="email"
               type="email"
@@ -114,11 +130,15 @@ const messages = res.rows.map((r) => ({
               class="gb-input font-mono"
               placeholder="you@example.com"
             />
-            <span class="absolute text-green-500 -bottom-4 font-mono text-[9px]">Stored as encrypted string for your peace of mind</span>
+            <span class="absolute text-green-500 -bottom-4 font-mono text-[9px]"
+              >Stored as encrypted string for your peace of mind</span
+            >
           </label>
         </div>
 
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-2">
+        <div
+          class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-2"
+        >
           <p class="gb-ascii font-mono text-xs sm:text-sm">
             ------------------------------------------------------------
           </p>
@@ -130,54 +150,159 @@ const messages = res.rows.map((r) => ({
     </div>
 
     <div class="mt-10" id="gb-entries" data-density="guestbook">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4 mb-4">
+      <div
+        class="flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4 mb-4"
+      >
         <div class="flex items-baseline justify-between gap-4">
           <p class="font-display text-lg">ENTRIES</p>
           <p class="gb-ascii font-mono text-xs sm:text-sm">[ UTC DATES ]</p>
         </div>
 
         <div class="gb-toggle-row" aria-label="Entries density">
-          <button type="button" class="gb-toggle" data-density-btn="guestbook" aria-pressed="true">
+          <button
+            type="button"
+            class="gb-toggle"
+            data-density-btn="guestbook"
+            aria-pressed="true"
+          >
             GUESTBOOK
           </button>
-          <button type="button" class="gb-toggle" data-density-btn="compact" aria-pressed="false">
+          <button
+            type="button"
+            class="gb-toggle"
+            data-density-btn="compact"
+            aria-pressed="false"
+          >
             COMPACT
           </button>
         </div>
       </div>
 
-      {messages.length === 0 ? (
-        <div class="gb-panel p-6">
-          <p class="font-mono text-sm">No entries yet. You can be first.</p>
-        </div>
-      ) : (
-        <ol class="gb-list grid gap-4">
-          {messages.map((m) => (
-            <li class="gb-entry p-4 sm:p-5">
-              <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2">
-                <p class="font-mono text-sm">
-                  <span class="gb-name">{m.name}</span>
-                  {m.website && (
-                    <>
-                      <span class="gb-ascii">  ::  </span>
-                      <a class="gb-link gb-url" href={m.website} rel="nofollow noopener noreferrer" target="_blank">
-                        {m.website.replace(/^https?:\/\//i, "")}
-                      </a>
-                    </>
-                  )}
+      {
+        messages.length === 0 ? (
+          <div class="gb-panel p-6">
+            <p class="font-mono text-sm">No entries yet. You can be first.</p>
+          </div>
+        ) : (
+          <ol class="gb-list grid gap-4">
+            {messages.map((m) => (
+              <li class="gb-entry p-4 sm:p-5">
+                <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2">
+                  <p class="font-mono text-sm">
+                    <span class="gb-name">{m.name}</span>
+                    {m.website && (
+                      <>
+                        <span class="gb-ascii"> :: </span>
+                        <a
+                          class="gb-link gb-url"
+                          href={m.website}
+                          rel="nofollow noopener noreferrer"
+                          target="_blank"
+                        >
+                          {m.website.replace(/^https?:\/\//i, "")}
+                        </a>
+                      </>
+                    )}
+                  </p>
+                  <p class="font-mono text-xs zag-muted">
+                    {toUtcDateString(m.createdAt)}
+                  </p>
+                </div>
+                <p class="gb-ascii gb-ascii-divider font-mono text-xs sm:text-sm mt-2">
+                  ============================================================
                 </p>
-                <p class="font-mono text-xs zag-muted">{toUtcDateString(m.createdAt)}</p>
-              </div>
-              <p class="gb-ascii gb-ascii-divider font-mono text-xs sm:text-sm mt-2">
-                ============================================================
-              </p>
-              <p class="font-mono text-sm leading-relaxed mt-3 gb-message">{m.message}</p>
-            </li>
-          ))}
-        </ol>
-      )}
+                <p class="font-mono text-sm leading-relaxed mt-3 gb-message">
+                  {m.message}
+                </p>
+              </li>
+            ))}
+          </ol>
+        )
+      }
     </div>
   </Section>
+
+  <script>
+    const headingBlock = document.getElementById("sprite-hover");
+    const heading = headingBlock?.querySelector("h1");
+    const sprite = heading?.querySelector("span");
+
+    if (heading && sprite) {
+      let interval = null;
+      const totalFrames = 52;
+      const frameWidth = 32;
+      const frameDelay = 80;
+
+      heading.addEventListener("mouseenter", () => {
+        if (interval) clearInterval(interval);
+
+        let frame = 0;
+        interval = setInterval(() => {
+          frame = (frame + 1) % totalFrames;
+          const offset = -frame * frameWidth;
+          sprite.style.backgroundPosition = `${offset}px 0px`;
+        }, frameDelay);
+      });
+
+      heading.addEventListener("mouseleave", () => {
+        if (interval) clearInterval(interval);
+        interval = null;
+        sprite.style.backgroundPosition = "0px 0px";
+      });
+    }
+  </script>
+
+  <style>
+    :root {
+      --guestbook-size: 64px;
+      --guestbook-frames: 52;
+    }
+
+    @media (min-width: 640px) {
+      :root {
+        --guestbook-size: 80px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      :root {
+        --guestbook-size: 96px;
+      }
+    }
+
+    .guestbook-sprite {
+      width: var(--guestbook-size);
+      height: var(--guestbook-size);
+      background-image: url("/guestbookspritesheet.png");
+      background-repeat: no-repeat;
+      background-size: calc(var(--guestbook-size) * var(--guestbook-frames))
+        var(--guestbook-size);
+      background-position: 0 0;
+      image-rendering: pixelated;
+    }
+
+    #sprite-hover:hover .guestbook-sprite {
+      animation: guestbook-walk 3s steps(var(--guestbook-frames)) infinite;
+    }
+
+    @keyframes guestbook-walk {
+      from {
+        background-position: 0 0;
+      }
+      to {
+        background-position: calc(
+            -1 * var(--guestbook-size) * var(--guestbook-frames)
+          )
+          0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #sprite-hover:hover .guestbook-sprite {
+        animation: none;
+      }
+    }
+  </style>
 
   <script is:inline>
     (() => {
@@ -250,13 +375,25 @@ const messages = res.rows.map((r) => ({
       position: absolute;
       inset: 0;
       opacity: 0;
-      transition: opacity var(--zag-transition-duration) var(--zag-transition-timing-function);
+      transition: opacity var(--zag-transition-duration)
+        var(--zag-transition-timing-function);
       background:
-        linear-gradient(90deg, transparent 0 31px, color-mix(in oklab, currentColor 6%, transparent) 31px 32px) 0 0 / 32px 32px,
-        linear-gradient(transparent 0 31px, color-mix(in oklab, currentColor 6%, transparent) 31px 32px) 0 0 / 32px 32px;
+        linear-gradient(
+            90deg,
+            transparent 0 31px,
+            color-mix(in oklab, currentColor 6%, transparent) 31px 32px
+          )
+          0 0 / 32px 32px,
+        linear-gradient(
+            transparent 0 31px,
+            color-mix(in oklab, currentColor 6%, transparent) 31px 32px
+          )
+          0 0 / 32px 32px;
       pointer-events: none;
     }
-    .gb-entry:hover::before { opacity: 1; }
+    .gb-entry:hover::before {
+      opacity: 1;
+    }
 
     .gb-toggle-row {
       display: flex;
@@ -287,10 +424,19 @@ const messages = res.rows.map((r) => ({
       color: var(--color-zag-dark);
     }
 
-    #gb-entries[data-density="compact"] .gb-list { gap: 0.5rem; }
-    #gb-entries[data-density="compact"] .gb-entry { padding: 0.75rem; }
-    #gb-entries[data-density="compact"] .gb-message { margin-top: 0.5rem; line-height: 1.35; }
-    #gb-entries[data-density="compact"] .gb-ascii-divider { display: none; }
+    #gb-entries[data-density="compact"] .gb-list {
+      gap: 0.5rem;
+    }
+    #gb-entries[data-density="compact"] .gb-entry {
+      padding: 0.75rem;
+    }
+    #gb-entries[data-density="compact"] .gb-message {
+      margin-top: 0.5rem;
+      line-height: 1.35;
+    }
+    #gb-entries[data-density="compact"] .gb-ascii-divider {
+      display: none;
+    }
 
     .gb-url {
       overflow-wrap: anywhere;
@@ -309,11 +455,13 @@ const messages = res.rows.map((r) => ({
     }
     .gb-input:focus {
       border-color: var(--color-zag-accent-dark);
-      box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-zag-accent-dark) 30%, transparent);
+      box-shadow: 0 0 0 2px
+        color-mix(in oklab, var(--color-zag-accent-dark) 30%, transparent);
     }
     :where(.dark, .dark *) .gb-input:focus {
       border-color: var(--color-zag-accent-light);
-      box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-zag-accent-light) 30%, transparent);
+      box-shadow: 0 0 0 2px
+        color-mix(in oklab, var(--color-zag-accent-light) 30%, transparent);
     }
     .gb-button {
       padding: 0.75rem 1rem;
@@ -346,7 +494,9 @@ const messages = res.rows.map((r) => ({
         white-space: nowrap;
       }
     }
-    .gb-name { font-weight: 700; }
+    .gb-name {
+      font-weight: 700;
+    }
     .gb-link {
       text-decoration: underline;
       text-underline-offset: var(--zag-offset);
@@ -357,20 +507,36 @@ const messages = res.rows.map((r) => ({
     .gb-banner {
       border: var(--zag-stroke) solid;
       border-color: var(--color-zag-accent-dark);
-      background: color-mix(in oklab, var(--color-zag-accent-dark) 10%, transparent);
+      background: color-mix(
+        in oklab,
+        var(--color-zag-accent-dark) 10%,
+        transparent
+      );
     }
     :where(.dark, .dark *) .gb-banner {
       border-color: var(--color-zag-accent-light);
-      background: color-mix(in oklab, var(--color-zag-accent-light) 12%, transparent);
+      background: color-mix(
+        in oklab,
+        var(--color-zag-accent-light) 12%,
+        transparent
+      );
     }
 
     .gb-banner-error {
       border-color: var(--color-zag-dark-muted);
-      background: color-mix(in oklab, var(--color-zag-dark-muted) 10%, transparent);
+      background: color-mix(
+        in oklab,
+        var(--color-zag-dark-muted) 10%,
+        transparent
+      );
     }
     :where(.dark, .dark *) .gb-banner-error {
       border-color: var(--color-zag-light-muted);
-      background: color-mix(in oklab, var(--color-zag-light-muted) 12%, transparent);
+      background: color-mix(
+        in oklab,
+        var(--color-zag-light-muted) 12%,
+        transparent
+      );
     }
     .gb-hp {
       position: absolute;

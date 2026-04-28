@@ -1,5 +1,4 @@
 ---
-
 import { getConfigurationCollection } from "../lib/utils";
 import Anchor from "./common/Anchor.astro";
 import ThemeToggle from "./ThemeToggle.astro";
@@ -36,7 +35,14 @@ const { data: config } = await getConfigurationCollection();
         ))
       }
     </div>
-    <div class="flex gap-4 justify-between px-4 sm:px-0">
+    <div class="flex gap-4 justify-between px-4 sm:px-0" title="guestbook">
+      {
+        (
+          <Anchor url="/guestbook" aria-label="Sign the guestbook">
+            <span class="gb-icon inline-block" aria-hidden="true" />
+          </Anchor>
+        )
+      }
       {
         config.personal.githubProfile && (
           <Anchor
@@ -86,3 +92,23 @@ const { data: config } = await getConfigurationCollection();
 
   updateNavState();
 </script>
+
+<style>
+  .gb-icon {
+    width: 32px;
+    height: 32px;
+    background-image: url("/guestbook.png");
+    background-repeat: no-repeat;
+    background-size: 32px 32px;
+    background-position: 0 0;
+    image-rendering: pixelated;
+  }
+
+  @media (min-width: 640px) {
+    .gb-icon {
+      width: 40px;
+      height: 40px;
+      background-size: 40px 40px;
+    }
+  }
+</style>
