@@ -1,5 +1,4 @@
 ---
-
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import "../styles/global.css";
@@ -8,8 +7,35 @@ import "../styles/global.css";
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Theme detection - MUST be first to prevent flash -->
+    <script is:inline>
+      (() => {
+        const theme = (() => {
+          if (
+            typeof localStorage !== "undefined" &&
+            localStorage.getItem("theme")
+          ) {
+            return localStorage.getItem("theme");
+          }
+          if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            return "dark";
+          }
+          return "light";
+        })();
+
+        if (theme === "dark") {
+          document.documentElement.classList.add("dark");
+          document.documentElement.style.backgroundColor = "#18181b";
+        } else {
+          document.documentElement.classList.remove("dark");
+          document.documentElement.style.backgroundColor = "#fff";
+        }
+      })();
+    </script>
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
     <link rel="preconnect" href="https://fonts.bunny.net" />
@@ -17,28 +43,7 @@ import "../styles/global.css";
       href="https://fonts.bunny.net/css?family=ibm-plex-mono:400,400i,500,500i,600,600i,700,700i"
       rel="stylesheet"
     />
-    
-    <!-- Theme detection script - runs before page renders -->
-    <script is:inline>
-      const theme = (() => {
-        if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
-          return localStorage.getItem("theme") ?? "light";
-        }
-        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-          return "dark";
-        }
-        return "light";
-      })();
 
-      if (theme === "light") {
-        document.documentElement.classList.remove("dark");
-      } else {
-        document.documentElement.classList.add("dark");
-      }
-
-      window.localStorage.setItem("theme", theme);
-    </script>
-    
     <slot name="head" />
   </head>
   <body class="zag-bg zag-text zag-transition font-mono">
