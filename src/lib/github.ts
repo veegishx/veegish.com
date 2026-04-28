@@ -2,6 +2,17 @@ const GITHUB_USERNAME = "veegishx";
 const GITHUB_API = "https://api.github.com";
 const CONTRIBUTIONS_API = "https://github-contributions-api.com";
 
+function getHeaders(): Record<string, string> {
+	const headers: Record<string, string> = {
+		Accept: "application/vnd.github.v3+json",
+	};
+	const token = import.meta.env.GITHUB_TOKEN;
+	if (token) {
+		headers.Authorization = `Bearer ${token}`;
+	}
+	return headers;
+}
+
 export interface Repository {
 	id: number;
 	name: string;
@@ -46,9 +57,7 @@ export async function getRepositories(): Promise<Repository[]> {
 		const response = await fetch(
 			`${GITHUB_API}/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=30&type=owner`,
 			{
-				headers: {
-					"Accept": "application/vnd.github.v3+json",
-				},
+				headers: getHeaders(),
 			}
 		);
 
@@ -70,9 +79,7 @@ export async function getRecentEvents(): Promise<GitHubEvent[]> {
 		const response = await fetch(
 			`${GITHUB_API}/users/${GITHUB_USERNAME}/events/public?per_page=50`,
 			{
-				headers: {
-					"Accept": "application/vnd.github.v3+json",
-				},
+				headers: getHeaders(),
 			}
 		);
 
