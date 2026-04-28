@@ -16,7 +16,7 @@ const featuredProjects = (
   url: `/projects/${e.data.slug}`,
 }));
 const featuredArticles = (
-	await getCollection("blog", (e) => e.data.featured)
+	await getCollection("blog", (e) => e.data.featured && e.data.published === true)
 ).map((e) => ({
 	...e.data,
   url: `/${e.data.slug}`,
