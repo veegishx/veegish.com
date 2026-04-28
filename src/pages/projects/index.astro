@@ -316,4 +316,33 @@ const recentEvents = await getRecentEvents();
       }
     }
   </style>
+
+  <script is:inline>
+    (() => {
+      function initProjectsHoverAudio() {
+        const title = document.querySelector("#sprite-hover h1");
+        if (!title || title.dataset.bubbleAudioBound === "true") return;
+
+        const audio = new Audio("/potion_bubbles.mp3");
+        audio.loop = true;
+
+        function playAudio() {
+          audio.currentTime = 0;
+          audio.play().catch(() => {});
+        }
+
+        function stopAudio() {
+          audio.pause();
+          audio.currentTime = 0;
+        }
+
+        title.dataset.bubbleAudioBound = "true";
+        title.addEventListener("mouseenter", playAudio);
+        title.addEventListener("mouseleave", stopAudio);
+      }
+
+      initProjectsHoverAudio();
+      document.addEventListener("astro:page-load", initProjectsHoverAudio);
+    })();
+  </script>
 </Layout>
