@@ -1,69 +1,90 @@
 ---
-
 import { getCollection } from "astro:content";
 import ArticleSnippet from "../../components/ArticleSnippet.astro";
 import Section from "../../components/common/Section.astro";
 import Layout from "../../layouts/Layout.astro";
-import { getConfigurationCollection, calculateReadingTime } from "../../lib/utils";
+import {
+  getConfigurationCollection,
+  calculateReadingTime,
+} from "../../lib/utils";
 
-const articles = (await getCollection("blog", (e) => e.data.published === true)).sort(
-	(a, b) => b.data.timestamp.valueOf() - a.data.timestamp.valueOf(),
-);
+const articles = (
+  await getCollection("blog", (e) => e.data.published === true)
+).sort((a, b) => b.data.timestamp.valueOf() - a.data.timestamp.valueOf());
 
 const { data: config } = await getConfigurationCollection();
 ---
 
 <Layout>
-    <Fragment slot="head">
+  <Fragment slot="head">
     <title>{config.blogMeta.title}</title>
     <meta
       name="description"
       content={config.blogMeta.longDescription ?? config.blogMeta.description}
     />
     <meta property="og:title" content={config.blogMeta.title} />
-    <meta
-      property="og:description"
-      content={config.blogMeta.description}
-    />
-    {config.blogMeta.keywords && (
-      <meta name="keywords" content={config.blogMeta.keywords.join(", ")} />
-    )}
-    {config.blogMeta.cardImage && (
-      <meta property="og:image" content={config.blogMeta.cardImage} />
-    )}
+    <meta property="og:description" content={config.blogMeta.description} />
+    {
+      config.blogMeta.keywords && (
+        <meta name="keywords" content={config.blogMeta.keywords.join(", ")} />
+      )
+    }
+    {
+      config.blogMeta.cardImage && (
+        <meta property="og:image" content={config.blogMeta.cardImage} />
+      )
+    }
     <meta property="og:url" content={`${config.site.baseUrl}`} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={config.blogMeta.title} />
-    <meta
-      name="twitter:description"
-      content={config.blogMeta.description}
-    />
-    {config.blogMeta.cardImage && (
-      <meta name="twitter:image" content={config.blogMeta.cardImage} />
-    )}
+    <meta name="twitter:description" content={config.blogMeta.description} />
+    {
+      config.blogMeta.cardImage && (
+        <meta name="twitter:image" content={config.blogMeta.cardImage} />
+      )
+    }
     <meta http-equiv="content-language" content="en" />
     <meta name="language" content="English" />
     <link rel="canonical" href={`${config.site.baseUrl}`} />
   </Fragment>
   <Section class="my-8">
-    <div class="flex items-center justify-between pt-8 pb-16">
-      <h1 class="font-display text-2xl sm:text-4xl leading-loose">
-        {config.texts.articlesName}
-      </h1>
-      <a
-        href="/graph"
-        class="inline-flex items-center gap-2 px-3 py-2 text-sm bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg transition-colors"
-        title="View knowledge graph"
+    <div
+      id="sprite-hover"
+      class="flex flex-col md:flex-row items-center gap-4 pt-8 pb-16"
+    >
+      <span class="scroll-sprite inline-block flex-none" aria-hidden="true"
+      ></span>
+      <div
+        class="w-full flex flex-col items-center md:items-center md:flex-row md:justify-between gap-2"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="18" cy="5" r="3"/>
-          <circle cx="6" cy="12" r="3"/>
-          <circle cx="18" cy="19" r="3"/>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-        </svg>
-        Graph
-      </a>
+        <h1 class="font-display text-2xl sm:text-4xl leading-loose">
+          {config.texts.articlesName}
+        </h1>
+        <a
+          href="/graph"
+          class="inline-flex items-center gap-2 px-3 py-2 text-sm bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg transition-colors"
+          title="View knowledge graph"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+          Graph
+        </a>
+      </div>
     </div>
     <ul>
       {
@@ -81,4 +102,49 @@ const { data: config } = await getConfigurationCollection();
       }
     </ul>
   </Section>
+
+  <style>
+    :root {
+      --scroll-size: 146px;
+      --scroll-frames: 25;
+    }
+
+    @media (min-width: 768px) {
+      :root {
+      }
+    }
+
+    .scroll-sprite {
+      width: var(--scroll-size);
+      height: var(--scroll-size);
+      background-image: url("/scrollsprite.png");
+      background-repeat: no-repeat;
+      background-size: calc(var(--scroll-size) * var(--scroll-frames))
+        var(--scroll-size);
+      background-position: 0 0;
+      image-rendering: pixelated;
+    }
+
+    #sprite-hover:hover .scroll-sprite {
+      animation: scroll-anim 2s steps(var(--scroll-frames)) infinite;
+    }
+
+    @keyframes scroll-anim {
+      from {
+        background-position: 0 0;
+      }
+      to {
+        background-position: calc(
+            -1 * var(--scroll-size) * var(--scroll-frames)
+          )
+          0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #sprite-hover:hover .scroll-sprite {
+        animation: none;
+      }
+    }
+  </style>
 </Layout>
