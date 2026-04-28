@@ -266,6 +266,7 @@ const messages = res.rows.map((r) => ({
 
     #sprite-hover:hover .guestbook-sprite {
       animation: guestbook-walk 3s steps(var(--guestbook-frames)) infinite;
+      animation-delay: 1s;
     }
 
     @keyframes guestbook-walk {
@@ -401,6 +402,33 @@ const messages = res.rows.map((r) => ({
       }
     }
   </style>
+
+  <script is:inline>
+    (() => {
+      const h1 = document.querySelector("#sprite-hover h1");
+      if (!h1) return;
+
+      const audio = new Audio("/evil-sound-effect.mp3");
+      audio.loop = true;
+      let timeoutId = null;
+
+      h1.addEventListener("mouseenter", () => {
+        timeoutId = setTimeout(() => {
+          audio.currentTime = 0;
+          audio.play().catch(() => {});
+        }, 1000);
+      });
+
+      h1.addEventListener("mouseleave", () => {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          timeoutId = null;
+        }
+        audio.pause();
+        audio.currentTime = 0;
+      });
+    })();
+  </script>
 
   <script is:inline>
     (() => {
