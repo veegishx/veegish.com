@@ -71,10 +71,52 @@ import "../styles/global.css";
     <slot name="head" />
   </head>
   <body class="zag-bg zag-text font-mono">
+    <div class="route-loader" aria-hidden="true" transition:persist>
+      <div class="route-loader-bar"></div>
+    </div>
     <Header transition:persist />
     <main>
       <slot />
     </main>
     <Footer />
+
+    <script is:inline>
+      (() => {
+        function initRouteLoader() {
+          if (window.__routeLoaderInitialized) return;
+
+          window.__routeLoaderShowTimer = null;
+
+          function clearShowTimer() {
+            if (window.__routeLoaderShowTimer) {
+              clearTimeout(window.__routeLoaderShowTimer);
+              window.__routeLoaderShowTimer = null;
+            }
+          }
+
+          function startLoader() {
+            const loader = document.querySelector(".route-loader");
+            if (!loader) return;
+
+            clearShowTimer();
+            window.__routeLoaderShowTimer = setTimeout(() => {
+              loader.classList.add("route-loader-active");
+            }, 100);
+          }
+
+          function stopLoader() {
+            const loader = document.querySelector(".route-loader");
+            clearShowTimer();
+            loader?.classList.remove("route-loader-active");
+          }
+
+          window.__routeLoaderInitialized = true;
+          document.addEventListener("astro:before-preparation", startLoader);
+          document.addEventListener("astro:page-load", stopLoader);
+        }
+
+        initRouteLoader();
+      })();
+    </script>
   </body>
 </html>
