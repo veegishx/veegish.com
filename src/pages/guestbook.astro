@@ -44,8 +44,14 @@ const messages = res.rows.map((r) => ({
           class="w-full flex flex-col items-center md:items-start md:flex-row md:justify-between gap-2"
         >
           <h1
-            class="font-display text-2xl sm:text-3xl tracking-tight flex flex-wrap items-center gap-2"
+            class="font-display text-2xl sm:text-3xl tracking-tight flex flex-wrap items-center gap-2 relative"
           >
+            <span class="gb-hover-text">
+              Sign
+              <span class="gb-strike-text">the guestbook</span><span
+                class="gb-pact-text">a pact with the devil >:)</span
+              >
+            </span>
             GUESTBOOK
           </h1>
         </div>
@@ -74,7 +80,9 @@ const messages = res.rows.map((r) => ({
     <div class="gb-panel p-4 sm:p-6">
       <div class="flex items-baseline justify-between gap-4">
         <p class="font-display text-lg">SIGN THE BOOK</p>
-        <p class="gb-ascii font-mono text-xs sm:text-sm">[ SAY HELLO. ]</p>
+        <p class="gb-ascii font-mono text-xs sm:text-sm">
+          [ & REST WELL TRAVELLER. ]
+        </p>
       </div>
 
       <form method="post" action="/api/guestbook" class="mt-6 grid gap-4">
@@ -151,11 +159,13 @@ const messages = res.rows.map((r) => ({
 
     <div class="mt-10" id="gb-entries" data-density="guestbook">
       <div
-        class="flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4 mb-4"
+        class="flex flex-col gap-3 sm:flex-row items-baseline md:items-center justify-between sm:gap-4 mb-4"
       >
-        <div class="flex items-baseline justify-between gap-4">
-          <p class="font-display text-lg">ENTRIES</p>
-          <p class="gb-ascii font-mono text-xs sm:text-sm">[ UTC DATES ]</p>
+        <div class="w-full flex items-baseline justify-between gap-4">
+          <p class="font-display text-lg leading-0">ENTRIES</p>
+          <p class="gb-ascii font-mono text-xs sm:text-sm leading-0">
+            [ SANTA WAS HERE ]
+          </p>
         </div>
 
         <div class="gb-toggle-row" aria-label="Entries density">
@@ -228,7 +238,7 @@ const messages = res.rows.map((r) => ({
     const sprite = heading?.querySelector("span");
 
     if (heading && sprite) {
-      let interval = null;
+      let interval: string | number | NodeJS.Timeout | null | undefined = null;
       const totalFrames = 52;
       const frameWidth = 32;
       const frameDelay = 80;
@@ -300,6 +310,121 @@ const messages = res.rows.map((r) => ({
     @media (prefers-reduced-motion: reduce) {
       #sprite-hover:hover .guestbook-sprite {
         animation: none;
+      }
+      #sprite-hover:hover .gb-hover-text {
+        animation: none;
+        opacity: 1;
+        transform: translateY(-50%);
+      }
+      #sprite-hover:hover .gb-strike-text {
+        animation: none;
+        text-decoration: none;
+      }
+      #sprite-hover:hover .gb-pact-text {
+        animation: none;
+        opacity: 1;
+      }
+    }
+
+    .gb-hover-text {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-100%);
+      opacity: 0;
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      letter-spacing: 0.05em;
+      color: var(--color-zag-accent-dark);
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 0;
+    }
+
+    :where(.dark, .dark *) .gb-hover-text {
+      color: var(--color-zag-accent-light);
+    }
+
+    #sprite-hover:hover .gb-hover-text {
+      animation: gb-hover-slide 0.8s ease-out forwards;
+    }
+
+    #sprite-hover:hover .gb-strike-text {
+      animation: gb-hover-strike 1.5s ease-in-out 1s forwards;
+    }
+
+    #sprite-hover:hover .gb-pact-text {
+      animation: gb-pact-show 0.5s ease-in-out 1.5s forwards;
+    }
+
+    .gb-hover-text {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-100%);
+      opacity: 0;
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      letter-spacing: 0.05em;
+      color: var(--color-zag-accent-dark);
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 0;
+    }
+
+    .gb-pact-text {
+      color: #ef4444;
+      opacity: 0;
+      margin-left: 0.25rem;
+      display: inline-block;
+    }
+
+    :where(.dark, .dark *) .gb-hover-text {
+      color: var(--color-zag-accent-light);
+    }
+
+    .gb-strike-text {
+      display: inline-block;
+      text-decoration: none;
+    }
+
+    #sprite-hover:hover .gb-strike-text {
+      animation: gb-hover-strike 1.5s ease-in-out 1s forwards;
+    }
+
+    .gb-strike-text {
+      display: inline-block;
+      text-decoration: none;
+    }
+
+    @keyframes gb-hover-slide {
+      0% {
+        opacity: 0;
+        transform: translateY(-20%);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(120%);
+      }
+    }
+
+    @keyframes gb-hover-strike {
+      0% {
+        text-decoration: none;
+      }
+      100% {
+        text-decoration: line-through;
+        text-decoration-thickness: 2px;
+        text-decoration-color: currentColor;
+      }
+    }
+
+    @keyframes gb-pact-show {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
       }
     }
   </style>
