@@ -275,4 +275,168 @@
   .opsz {
     font-variation-settings: "opsz" 72;
   }
+
+  /* Guestbook entries - global styles for client-side rendered content */
+  .gb-panel {
+    border: var(--zag-stroke) solid;
+    border-color: var(--color-zag-dark);
+  }
+  :where(.dark, .dark *) .gb-panel {
+    border-color: var(--color-zag-light);
+  }
+  .gb-entry {
+    border: var(--zag-stroke) solid;
+    border-color: var(--color-zag-dark-muted);
+    position: relative;
+    min-width: 0;
+  }
+  :where(.dark, .dark *) .gb-entry {
+    border-color: var(--color-zag-light-muted);
+  }
+  .gb-entry::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity var(--zag-transition-duration)
+      var(--zag-transition-timing-function);
+    background:
+      linear-gradient(
+          90deg,
+          transparent 0 31px,
+          color-mix(in oklab, currentColor 6%, transparent) 31px 32px
+        )
+        0 0 / 32px 32px,
+      linear-gradient(
+          transparent 0 31px,
+          color-mix(in oklab, currentColor 6%, transparent) 31px 32px
+        )
+        0 0 / 32px 32px;
+    pointer-events: none;
+  }
+  .gb-entry:hover::before {
+    opacity: 1;
+  }
+
+  #gb-entries[data-density="compact"] .gb-list {
+    gap: 0.5rem;
+  }
+  #gb-entries[data-density="compact"] .gb-entry {
+    padding: 0.75rem;
+  }
+  #gb-entries[data-density="compact"] .gb-message {
+    margin-top: 0.5rem;
+    line-height: 1.35;
+  }
+  #gb-entries[data-density="compact"] .gb-ascii-divider {
+    display: none;
+  }
+
+  .gb-url {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  .gb-input {
+    width: 100%;
+    padding: 0.75rem 0.875rem;
+    border: var(--zag-stroke) solid;
+    border-color: var(--color-zag-dark);
+    background-color: transparent;
+    outline: none;
+  }
+  :where(.dark, .dark *) .gb-input {
+    border-color: var(--color-zag-light);
+  }
+  .gb-input:focus {
+    border-color: var(--color-zag-accent-dark);
+    box-shadow: 0 0 0 2px
+      color-mix(in oklab, var(--color-zag-accent-dark) 30%, transparent);
+  }
+  :where(.dark, .dark *) .gb-input:focus {
+    border-color: var(--color-zag-accent-light);
+    box-shadow: 0 0 0 2px
+      color-mix(in oklab, var(--color-zag-accent-light) 30%, transparent);
+  }
+  .gb-button {
+    padding: 0.75rem 1rem;
+    border: var(--zag-stroke) solid;
+    border-color: var(--color-zag-dark);
+    background: var(--color-zag-light);
+    cursor: pointer;
+  }
+  :where(.dark, .dark *) .gb-button {
+    border-color: var(--color-zag-light);
+    background: var(--color-zag-dark);
+  }
+  .gb-button:hover {
+    transform: translateY(-1px);
+  }
+  .gb-ascii {
+    opacity: 0.8;
+    letter-spacing: 0.04em;
+    user-select: none;
+  }
+
+  /* Mobile-first: long ASCII lines can force horizontal overflow. */
+  .gb-ascii-divider {
+    display: none;
+  }
+  @media (min-width: 640px) {
+    .gb-ascii-divider {
+      display: block;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+  }
+  .gb-name {
+    font-weight: 700;
+  }
+  .gb-link {
+    text-decoration: underline;
+    text-underline-offset: var(--zag-offset);
+  }
+  .gb-message {
+    white-space: pre-wrap;
+  }
+  .gb-banner {
+    border: var(--zag-stroke) solid;
+    border-color: var(--color-zag-accent-dark);
+    background: color-mix(
+      in oklab,
+      var(--color-zag-accent-dark) 10%,
+      transparent
+    );
+  }
+  :where(.dark, .dark *) .gb-banner {
+    border-color: var(--color-zag-accent-light);
+    background: color-mix(
+      in oklab,
+      var(--color-zag-accent-light) 12%,
+      transparent
+    );
+  }
+
+  .gb-banner-error {
+    border-color: var(--color-zag-dark-muted);
+    background: color-mix(
+      in oklab,
+      var(--color-zag-dark-muted) 10%,
+      transparent
+    );
+  }
+  :where(.dark, .dark *) .gb-banner-error {
+    border-color: var(--color-zag-light-muted);
+    background: color-mix(
+      in oklab,
+      var(--color-zag-light-muted) 12%,
+      transparent
+    );
+  }
+  .gb-hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
 }
