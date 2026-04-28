@@ -1,67 +1,37 @@
-![Zaggonaut, a retro-inspired theme for Astro.](./images/README.png)
+## Development Notes
 
-Zaggonaut is a retro-inspired black & white theme for Astro, built using TypeScript, TailwindCSS, and of course, Astro.
+### Vite Cache Issue
 
-> [!NOTE]  
-> Introducing Zaggonaut 2.0!
-> This is a complete rewrite of the internal content layer, making use of Astro's new Content Collections feature, among other enhancements.
-
-If you are looking for the original Zaggonaut theme, you can find it [on the v1 branch](https://github.com/RATIU5/zaggonaut/tree/v1).
-
-## Getting Started
-
-[View the demo](https://zaggonaut.dev) or [view the source code](https://github.com/RATIU5/zaggonaut).
-
-Alternatively, you can create a new Astro project with Zaggonaut like this:
+If you encounter a `504 (Outdated Optimize Dep)` error or components fail to load in dev mode:
 
 ```bash
-# pnpm
-pnpm create astro@latest --template RATIU5/zaggonaut
+rm -rf node_modules/.vite && pnpm dev
 ```
 
-> [!IMPORTANT]  
-> Currently, `pnpm` is the only supported package manager due to `pnpm` throwing peer-dependency conflicts.
+This clears Vite's stale dependency cache. Can happen after:
 
-## Features
+- Installing/updating dependencies
+- Switching branches with different deps
+- Reinstalling node_modules
 
-- Content Collections
-- Dark & light mode
-- Customizable colors
-- 100 / 100 Lighthouse score
-- Fully accessible
-- Fully responsive
-- Type-safe
-- SEO-friendly
+### Guestbook Setup
 
-## Customization
+The guestbook feature requires environment variables. Set these in Vercel or your local `.env` file:
 
-The entire theme is fully customizable. The theme is setup a specific way to make it easy to customize.
+- `TURSO_DATABASE_URL` - Turso database URL (e.g., `libsql://<db>.turso.io`)
+- `TURSO_AUTH_TOKEN` - Turso auth token
+- `GUESTBOOK_SALT` - Random string for IP hashing (e.g., `openssl rand -hex 32`)
+- `GUESTBOOK_EXPORT_TOKEN` - Token for exporting guestbook data (e.g., `openssl rand -hex 32`)
+- `GUESTBOOK_EMAIL_KEY` - 32-byte key for email encryption (e.g., `openssl rand -base64 32`)
 
-### Colors
+Run the migration script to create the database table:
 
-You can customize the colors of the theme by editing the `src/styles/global.css` file.
-This file uses Tailwind CSS and CSS variables to customize the colors of the theme.
-Zaggonaut uses the following CSS variables:
+```bash
+pnpm guestbook:migrate
+```
 
-- `--color-zag-dark`: The dark color of the theme
-- `--color-zag-light`: The light color of the theme
-- `--color-zag-dark-muted`: The dark color of the theme with a slight opacity
-- `--color-zag-light-muted`: The light color of the theme with a slight opacity
-- `--color-zag-accent-light`: The light accent color of the theme
-- `--color-zag-accent-light-muted`: The light accent color of the theme with a slight opacity
-- `--color-zag-accent-dark`: The dark accent color of the theme
-- `--color-zag-accent-dark-muted`: The dark accent color of the theme with a slight opacity
+Export guestbook data (admin-only):
 
-### Content Customization
-
-95% of the content you'll want to customize will be located inside the `content` directory. Let's break down the specific files/directories you may want to edit:
-
-- `content/configuration.toml`: This file contains the site configuration, such as metadata, social links, and text content.
-
-- `content/blogs/`: This directory contains your blog posts. Each post is a Markdown file with metadata in the frontmatter at the top.
-
-- `content/projects/`: This directory contains your projects. Each project is a Markdown file also with metadata in the frontmatter.
-
-## Ready To Try?
-
-Check out [the theme website](https://zaggonaut.dev) to give it a spin!
+```
+GET /api/guestbook/export.json?token=YOUR_EXPORT_TOKEN
+```
