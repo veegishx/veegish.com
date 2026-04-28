@@ -85,25 +85,46 @@ const backlinks = await getBacklinksForPost(slug);
 	</div>
 </div>
 
-<script>
-	const toggle = document.getElementById("backlinks-toggle");
-	const sidebar = document.getElementById("backlinks-sidebar");
-	const close = document.getElementById("backlinks-close");
+<script is:inline>
+	(() => {
+		function initBacklinksSidebar() {
+			const toggle = document.getElementById("backlinks-toggle");
+			const sidebar = document.getElementById("backlinks-sidebar");
+			const close = document.getElementById("backlinks-close");
 
-	function openSidebar() {
-		sidebar?.classList.remove("translate-x-full");
-	}
+			if (!toggle || !sidebar || !close) return;
 
-	function closeSidebar() {
-		sidebar?.classList.add("translate-x-full");
-	}
+			function openSidebar() {
+				sidebar.classList.remove("translate-x-full");
+			}
 
-	toggle?.addEventListener("click", openSidebar);
-	close?.addEventListener("click", closeSidebar);
+			function closeSidebar() {
+				sidebar.classList.add("translate-x-full");
+			}
 
-	document.addEventListener("keydown", (e) => {
-		if (e.key === "Escape") {
-			closeSidebar();
+			if (toggle.dataset.sidebarBound !== "true") {
+				toggle.dataset.sidebarBound = "true";
+				toggle.addEventListener("click", openSidebar);
+			}
+
+			if (close.dataset.sidebarBound !== "true") {
+				close.dataset.sidebarBound = "true";
+				close.addEventListener("click", closeSidebar);
+			}
+
+			if (!window.__backlinksEscapeBound) {
+				window.__backlinksEscapeBound = true;
+				document.addEventListener("keydown", (e) => {
+					if (e.key === "Escape") {
+						document
+							.querySelectorAll("#backlinks-sidebar")
+							.forEach((currentSidebar) => currentSidebar.classList.add("translate-x-full"));
+					}
+				});
+			}
 		}
-	});
+
+		initBacklinksSidebar();
+		document.addEventListener("astro:page-load", initBacklinksSidebar);
+	})();
 </script>

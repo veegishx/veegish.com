@@ -56,6 +56,24 @@
 }
 
 @layer base {
+  html {
+    --page-transition-bg: var(--color-zag-light);
+    background-color: var(--page-transition-bg);
+    color-scheme: light;
+  }
+
+  html.dark {
+    --page-transition-bg: var(--color-zag-dark);
+    background-color: var(--page-transition-bg);
+    color-scheme: dark;
+  }
+
+  ::view-transition-group(root),
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    background-color: var(--page-transition-bg);
+  }
+
   :root {
     --zag-stroke: 2px;
     --zag-offset: 6px;

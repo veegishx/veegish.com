@@ -4,15 +4,24 @@
 <span id="counter-value">0</span>
 <button id="counter-increment">Increment</button>
 
-<script>
-  const counterValue = document.getElementById("counter-value");
-  const counterIncrement = document.getElementById("counter-increment");
+<script is:inline>
+  (() => {
+    function initCounter() {
+      const counterValue = document.getElementById("counter-value");
+      const counterIncrement = document.getElementById("counter-increment");
 
-  if (counterValue && counterIncrement) {
-    let count = 0;
-    counterIncrement.addEventListener("click", () => {
-      count += 1;
-      counterValue.textContent = count.toString();
-    });
-  }
+      if (!counterValue || !counterIncrement) return;
+      if (counterIncrement.dataset.counterBound === "true") return;
+
+      let count = 0;
+      counterIncrement.dataset.counterBound = "true";
+      counterIncrement.addEventListener("click", () => {
+        count += 1;
+        counterValue.textContent = count.toString();
+      });
+    }
+
+    initCounter();
+    document.addEventListener("astro:page-load", initCounter);
+  })();
 </script>

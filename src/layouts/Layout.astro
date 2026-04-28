@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from "astro:transitions";
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import "../styles/global.css";
@@ -7,9 +8,21 @@ import "../styles/global.css";
 <!doctype html>
 <html lang="en">
   <head>
+    <ClientRouter />
     <!-- Theme detection - MUST be first to prevent flash -->
     <script is:inline>
       (() => {
+        const applyTheme = (theme) => {
+          const isDark = theme === "dark";
+          document.documentElement.classList.toggle("dark", isDark);
+          document.documentElement.style.backgroundColor = isDark
+            ? "#18181b"
+            : "#fff";
+          document.documentElement.style.colorScheme = isDark ? "dark" : "light";
+        };
+
+        window.__applyTheme = applyTheme;
+
         const theme = (() => {
           if (
             typeof localStorage !== "undefined" &&
@@ -23,13 +36,24 @@ import "../styles/global.css";
           return "light";
         })();
 
-        if (theme === "dark") {
-          document.documentElement.classList.add("dark");
-          document.documentElement.style.backgroundColor = "#18181b";
-        } else {
-          document.documentElement.classList.remove("dark");
-          document.documentElement.style.backgroundColor = "#fff";
-        }
+        applyTheme(theme);
+
+        document.addEventListener("astro:after-swap", () => {
+          const nextTheme = (() => {
+            if (
+              typeof localStorage !== "undefined" &&
+              localStorage.getItem("theme")
+            ) {
+              return localStorage.getItem("theme");
+            }
+            if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+              return "dark";
+            }
+            return "light";
+          })();
+
+          applyTheme(nextTheme);
+        });
       })();
     </script>
 
@@ -46,8 +70,8 @@ import "../styles/global.css";
 
     <slot name="head" />
   </head>
-  <body class="zag-bg zag-text zag-transition font-mono">
-    <Header />
+  <body class="zag-bg zag-text font-mono">
+    <Header transition:persist />
     <main>
       <slot />
     </main>

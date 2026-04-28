@@ -11,7 +11,7 @@ export default function RepositoryCard({ repo }: RepositoryCardProps) {
 			href={repo.html_url}
 			target="_blank"
 			rel="noopener noreferrer"
-			className="group block p-4 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+			className="group block p-4 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800"
 		>
 			<div className="flex items-start justify-between gap-2 mb-2">
 				<div className="flex items-center gap-2">
