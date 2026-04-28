@@ -66,6 +66,7 @@ const recentEvents = await getRecentEvents();
         class="w-full flex flex-col items-center md:items-start md:flex-row md:justify-between gap-2"
       >
         <h1
+          id="projects-page-title"
           class="page-title-glow font-display text-2xl sm:text-4xl leading-tight flex flex-wrap items-center gap-2"
         >
           {config.texts.projectsName}
@@ -318,10 +319,12 @@ const recentEvents = await getRecentEvents();
   </style>
 
   <script is:inline>
-    (() => {
-      function initProjectsHoverAudio() {
-        const title = document.querySelector("#sprite-hover h1");
-        if (!title || title.dataset.bubbleAudioBound === "true") return;
+      (() => {
+        function initProjectsHoverAudio() {
+          if (window.location.pathname !== "/projects") return;
+
+          const title = document.getElementById("projects-page-title");
+          if (!title || title.dataset.bubbleAudioBound === "true") return;
 
         const audio = new Audio("/potion_bubbles.mp3");
         audio.loop = true;

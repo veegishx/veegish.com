@@ -1,32 +1,11 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Section from "../components/common/Section.astro";
-import { getGuestbookDb } from "../lib/guestbook/db";
 
 export const prerender = false;
 
-function toUtcDateString(ms: number): string {
-  const d = new Date(ms);
-  const y = d.getUTCFullYear();
-  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(d.getUTCDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
 const signed = Astro.url.searchParams.get("signed") === "1";
 const error = Astro.url.searchParams.get("error") ?? "";
-const db = getGuestbookDb();
-const res = await db.execute({
-  sql: "SELECT id, name, message, website, created_at FROM guestbook_messages ORDER BY created_at DESC LIMIT 50",
-  args: [],
-});
-const messages = res.rows.map((r) => ({
-  id: String(r.id),
-  name: String(r.name),
-  message: String(r.message),
-  website: r.website ? String(r.website) : undefined,
-  createdAt: Number(r.created_at),
-}));
 ---
 
 <Layout>
@@ -189,47 +168,10 @@ const messages = res.rows.map((r) => ({
         </div>
       </div>
 
-      {
-        messages.length === 0 ? (
-          <div class="gb-panel p-6">
-            <p class="font-mono text-sm">No entries yet. You can be first.</p>
-          </div>
-        ) : (
-          <ol class="gb-list grid gap-4">
-            {messages.map((m) => (
-              <li class="gb-entry p-4 sm:p-5">
-                <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2">
-                  <p class="font-mono text-sm">
-                    <span class="gb-name">{m.name}</span>
-                    {m.website && (
-                      <>
-                        <span class="gb-ascii"> :: </span>
-                        <a
-                          class="gb-link gb-url"
-                          href={m.website}
-                          rel="nofollow noopener noreferrer"
-                          target="_blank"
-                        >
-                          {m.website.replace(/^https?:\/\//i, "")}
-                        </a>
-                      </>
-                    )}
-                  </p>
-                  <p class="font-mono text-xs zag-muted">
-                    {toUtcDateString(m.createdAt)}
-                  </p>
-                </div>
-                <p class="gb-ascii gb-ascii-divider font-mono text-xs sm:text-sm mt-2">
-                  ============================================================
-                </p>
-                <p class="font-mono text-sm leading-relaxed mt-3 gb-message">
-                  {m.message}
-                </p>
-              </li>
-            ))}
-          </ol>
-        )
-      }
+      <div class="gb-panel p-6" data-guestbook-loading>
+        <p class="font-mono text-sm">Loading entries...</p>
+      </div>
+      <div data-guestbook-list hidden></div>
     </div>
   </Section>
 </Layout>
@@ -407,6 +349,103 @@ const messages = res.rows.map((r) => ({
     }
   }
 </style>
+
+<script is:inline>
+  (() => {
+    function initGuestbookEntries() {
+      const root = document.getElementById("gb-entries");
+      const loading = root?.querySelector("[data-guestbook-loading]");
+      const listHost = root?.querySelector("[data-guestbook-list]");
+      if (!root || !loading || !listHost || root.dataset.entriesBound === "true") {
+        return;
+      }
+
+      root.dataset.entriesBound = "true";
+
+      const escapeHtml = (value) =>
+        value
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+
+      const normalizeUrlLabel = (value) => value.replace(/^https?:\/\//i, "");
+
+      function renderMessages(messages) {
+        if (messages.length === 0) {
+          listHost.innerHTML = `
+            <div class="gb-panel p-6">
+              <p class="font-mono text-sm">No entries yet. You can be first.</p>
+            </div>
+          `;
+          return;
+        }
+
+        listHost.innerHTML = `
+          <ol class="gb-list grid gap-4">
+            ${messages
+              .map((message) => {
+                const website = message.website
+                  ? `
+                    <span class="gb-ascii"> :: </span>
+                    <a
+                      class="gb-link gb-url"
+                      href="${escapeHtml(message.website)}"
+                      rel="nofollow noopener noreferrer"
+                      target="_blank"
+                    >
+                      ${escapeHtml(normalizeUrlLabel(message.website))}
+                    </a>
+                  `
+                  : "";
+
+                return `
+                  <li class="gb-entry p-4 sm:p-5">
+                    <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2">
+                      <p class="font-mono text-sm">
+                        <span class="gb-name">${escapeHtml(message.name)}</span>
+                        ${website}
+                      </p>
+                      <p class="font-mono text-xs zag-muted">${escapeHtml(message.createdAtDate)}</p>
+                    </div>
+                    <p class="gb-ascii gb-ascii-divider font-mono text-xs sm:text-sm mt-2">
+                      ============================================================
+                    </p>
+                    <p class="font-mono text-sm leading-relaxed mt-3 gb-message">${escapeHtml(message.message)}</p>
+                  </li>
+                `;
+              })
+              .join("")}
+          </ol>
+        `;
+      }
+
+      fetch("/api/guestbook?limit=50")
+        .then((response) => {
+          if (!response.ok) throw new Error("Failed to load guestbook entries.");
+          return response.json();
+        })
+        .then((data) => {
+          renderMessages(Array.isArray(data.messages) ? data.messages : []);
+        })
+        .catch(() => {
+          listHost.innerHTML = `
+            <div class="gb-panel gb-banner-error p-6">
+              <p class="font-mono text-sm">Could not load entries right now.</p>
+            </div>
+          `;
+        })
+        .finally(() => {
+          loading.remove();
+          listHost.hidden = false;
+        });
+    }
+
+    initGuestbookEntries();
+    document.addEventListener("astro:page-load", initGuestbookEntries);
+  })();
+</script>
 
 <script is:inline>
   (() => {
