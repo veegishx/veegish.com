@@ -11,7 +11,11 @@ const currentPath = Astro.url.pathname;
   <div
     class="zag-bg sm:hidden relative z-50 px-4 py-4 flex items-center justify-between w-full"
   >
-    <button class="flex items-center" type="button" aria-label="Toggle navigation menu">
+    <button
+      class="flex items-center"
+      type="button"
+      aria-label="Toggle navigation menu"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="32"
@@ -24,8 +28,12 @@ const currentPath = Astro.url.pathname;
       </svg>
     </button>
     <div class="flex items-center gap-4">
-      <Anchor url="/guestbook" aria-label="Sign the guestbook" class="flex items-center">
-        <span class="gb-icon inline-block" aria-hidden="true" />
+      <Anchor
+        url="/guestbook"
+        aria-label="Sign the guestbook"
+        class="flex items-center"
+      >
+        <span class="gb-icon inline-block" aria-hidden="true"></span>
       </Anchor>
       <span class="flex items-center">
         <ThemeToggle />
@@ -40,15 +48,37 @@ const currentPath = Astro.url.pathname;
     >
       {
         Object.entries(config.menu).map((i) => {
-          const isActive = currentPath === i[1] || (i[1] !== '/' && currentPath.startsWith(i[1]));
-          return <Anchor url={i[1]} class:list={[isActive && 'anchor-active']}>{i[0]}</Anchor>;
+          const isDisabled = i[1] === "#disabled";
+          const isActive =
+            !isDisabled &&
+            (currentPath === i[1] ||
+              (i[1] !== "/" && currentPath.startsWith(i[1])));
+          return isDisabled ? (
+            <span
+              class="tooltip-disabled text-zinc-400 dark:text-zinc-600 cursor-not-allowed mt-2"
+              data-tip="Ran out of budget, will probably do it in the next sprint *fingers crossed*"
+            >
+              {i[0]}
+            </span>
+          ) : (
+            <Anchor url={i[1]} class:list={[isActive && "anchor-active"]}>
+              {i[0]}
+            </Anchor>
+          );
         })
       }
     </div>
-    <div class="flex items-center gap-4 justify-between px-4 sm:px-0" title="guestbook">
+    <div
+      class="flex items-center gap-4 justify-between px-4 sm:px-0"
+      title="guestbook"
+    >
       {
         (
-          <Anchor url="/guestbook" aria-label="Sign the guestbook" class="hidden sm:inline-flex sm:items-center">
+          <Anchor
+            url="/guestbook"
+            aria-label="Sign the guestbook"
+            class="hidden sm:inline-flex sm:items-center"
+          >
             <span class="gb-icon inline-block" aria-hidden="true" />
           </Anchor>
         )
@@ -117,7 +147,9 @@ const currentPath = Astro.url.pathname;
   (() => {
     function initHeaderNav() {
       const header = document.querySelector("header");
-      const button = header?.querySelector('button[aria-label="Toggle navigation menu"]');
+      const button = header?.querySelector(
+        'button[aria-label="Toggle navigation menu"]',
+      );
       const nav = header?.querySelector("nav");
       if (!button || !nav) return;
 
@@ -149,12 +181,12 @@ const currentPath = Astro.url.pathname;
       if (!window.__headerResizeBound) {
         window.__headerResizeBound = true;
         window.addEventListener("resize", () => {
-          document
-            .querySelectorAll("header nav")
-            .forEach((currentNav) => {
-              const isMobile = window.matchMedia("(max-width: 640px)").matches;
-              currentNav.style.transform = isMobile ? "translateY(-100%)" : "translateY(0)";
-            });
+          document.querySelectorAll("header nav").forEach((currentNav) => {
+            const isMobile = window.matchMedia("(max-width: 640px)").matches;
+            currentNav.style.transform = isMobile
+              ? "translateY(-100%)"
+              : "translateY(0)";
+          });
         });
       }
 
@@ -186,7 +218,9 @@ const currentPath = Astro.url.pathname;
       box-shadow: 0 0 4px 1px rgba(239, 68, 68, 0.4);
     }
     50% {
-      box-shadow: 0 0 20px 6px rgba(239, 68, 68, 0.9), 0 0 40px 10px rgba(239, 68, 68, 0.5);
+      box-shadow:
+        0 0 20px 6px rgba(239, 68, 68, 0.9),
+        0 0 40px 10px rgba(239, 68, 68, 0.5);
     }
   }
 
@@ -216,6 +250,85 @@ const currentPath = Astro.url.pathname;
   }
   :where(.dark, .dark *) .anchor-active {
     color: var(--color-zag-accent-light);
+  }
+
+  .tooltip-disabled {
+    position: relative;
+  }
+
+  .tooltip-disabled::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    background: var(--color-zag-dark);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+    z-index: 50;
+  }
+
+  .tooltip-disabled:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-4px);
+  }
+
+  :where(.dark, .dark *) .tooltip-disabled::after {
+    background: var(--color-zag-light);
+    color: var(--color-zag-dark);
+  }
+
+  @media (max-width: 640px) {
+    .tooltip-disabled::after {
+      white-space: normal;
+      width: max-content;
+      max-width: 200px;
+      left: 0;
+      transform: translateX(0) translateY(-8px);
+      font-size: 11px;
+      text-wrap: balance;
+    }
+
+    .tooltip-disabled:hover::after {
+      transform: translateX(0) translateY(-4px);
+    }
+  }
+
+  .tooltip-disabled::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: -50px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    background: var(--color-zag-dark);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+    z-index: 50;
+  }
+
+  .tooltip-disabled:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-4px);
+  }
+
+  :where(.dark, .dark *) .tooltip-disabled::after {
+    background: var(--color-zag-light);
+    color: var(--color-zag-dark);
   }
 
   @media (min-width: 640px) {

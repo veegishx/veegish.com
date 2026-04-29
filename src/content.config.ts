@@ -239,6 +239,7 @@ const configuration = defineCollection({
       home: z.string().default("/"),
       projects: z.string().default("/projects"),
       blog: z.string().default("/blog"),
+      about: z.string().default("/about"),
       /** Add other menu items here **/
     }),
   }),
