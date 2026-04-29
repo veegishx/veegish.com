@@ -151,7 +151,11 @@ const currentPath = Astro.url.pathname;
         'button[aria-label="Toggle navigation menu"]',
       );
       const nav = header?.querySelector("nav");
-      if (!button || !nav) return;
+      if (!button || !nav) {
+        // Retry if elements not found
+        setTimeout(initHeaderNav, 100);
+        return;
+      }
 
       let isOpen = false;
 
@@ -165,18 +169,18 @@ const currentPath = Astro.url.pathname;
         }
       }
 
-      if (button.dataset.navBound === "true") {
-        updateNavState();
-        return;
+      // Remove existing listener to avoid duplicates
+      if (button._toggleHandler) {
+        button.removeEventListener("click", button._toggleHandler);
       }
 
-      function toggleNav() {
+      button._toggleHandler = () => {
         isOpen = !isOpen;
         updateNavState();
-      }
+      };
 
+      button.addEventListener("click", button._toggleHandler);
       button.dataset.navBound = "true";
-      button.addEventListener("click", toggleNav);
 
       if (!window.__headerResizeBound) {
         window.__headerResizeBound = true;
@@ -193,8 +197,15 @@ const currentPath = Astro.url.pathname;
       updateNavState();
     }
 
-    initHeaderNav();
-    document.addEventListener("astro:page-load", initHeaderNav);
+    // Use multiple event types for robustness
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initHeaderNav);
+    } else {
+      initHeaderNav();
+    }
+    document.addEventListener("astro:page-load", () => {
+      setTimeout(initHeaderNav, 0);
+    });
   })();
 </script>
 
