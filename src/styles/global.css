@@ -62,10 +62,24 @@
     color-scheme: light;
   }
 
+  @media (prefers-color-scheme: dark) {
+    html {
+      --page-transition-bg: var(--color-zag-dark);
+      background-color: var(--page-transition-bg);
+      color-scheme: dark;
+    }
+  }
+
   html.dark {
     --page-transition-bg: var(--color-zag-dark);
     background-color: var(--page-transition-bg);
     color-scheme: dark;
+  }
+
+  html.force-light {
+    --page-transition-bg: var(--color-zag-light);
+    background-color: var(--page-transition-bg);
+    color-scheme: light;
   }
 
   ::view-transition-group(root),

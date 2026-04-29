@@ -27,11 +27,11 @@
 <script is:inline>
   if (!window.__themeToggleInitialized) {
     window.__themeToggleInitialized = true;
-    
+
     const handleToggleClick = () => {
       const element = document.documentElement;
       const nextTheme = element.classList.contains("dark") ? "light" : "dark";
-      localStorage.setItem("theme", nextTheme);
+      try { localStorage.setItem("theme", nextTheme); } catch {}
 
       if (window.__applyTheme) {
         window.__applyTheme(nextTheme);

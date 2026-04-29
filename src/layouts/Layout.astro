@@ -10,33 +10,22 @@ import "../styles/global.css";
     <!-- Theme detection - MUST be first to prevent flash -->
     <script is:inline>
       (() => {
-        const applyTheme = (theme) => {
+        const prefersDark = () => window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const saved = (() => { try { return localStorage.getItem("theme"); } catch { return null; } })();
+        const isDark = saved ? saved === "dark" : prefersDark();
+
+        document.documentElement.classList.toggle("dark", isDark);
+        if (!isDark && prefersDark()) document.documentElement.classList.add("force-light");
+        document.documentElement.style.backgroundColor = isDark ? "#18181b" : "#fff";
+        document.documentElement.style.colorScheme = isDark ? "dark" : "light";
+
+        window.__applyTheme = (theme) => {
           const isDark = theme === "dark";
           document.documentElement.classList.toggle("dark", isDark);
-          document.documentElement.style.backgroundColor = isDark
-            ? "#18181b"
-            : "#fff";
-          document.documentElement.style.colorScheme = isDark
-            ? "dark"
-            : "light";
+          document.documentElement.classList.toggle("force-light", !isDark && prefersDark());
+          document.documentElement.style.backgroundColor = isDark ? "#18181b" : "#fff";
+          document.documentElement.style.colorScheme = isDark ? "dark" : "light";
         };
-
-        window.__applyTheme = applyTheme;
-
-        const theme = (() => {
-          if (
-            typeof localStorage !== "undefined" &&
-            localStorage.getItem("theme")
-          ) {
-            return localStorage.getItem("theme");
-          }
-          if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-            return "dark";
-          }
-          return "light";
-        })();
-
-        applyTheme(theme);
       })();
     </script>
 
