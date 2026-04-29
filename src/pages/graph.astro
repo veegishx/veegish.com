@@ -27,7 +27,7 @@ const { data: config } = await getConfigurationCollection();
       Drag nodes to reposition, scroll to zoom, and click any node to visit that post.
     </p>
     <div class="border border-zinc-300 dark:border-zinc-700 rounded-lg overflow-hidden bg-white dark:bg-zinc-900">
-      <Graph client:load className="min-h-[600px]" />
+      <Graph client:only="react" className="min-h-[600px]" />
     </div>
   </Section>
 </Layout>

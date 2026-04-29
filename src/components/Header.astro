@@ -138,8 +138,12 @@ const currentPath = Astro.url.pathname;
       scheduleNext();
     }
 
-    initHeaderIcons();
-    document.addEventListener("astro:page-load", initHeaderIcons);
+    // Use multiple event types for robustness
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initHeaderIcons);
+    } else {
+      initHeaderIcons();
+    }
   })();
 </script>
 
@@ -203,9 +207,6 @@ const currentPath = Astro.url.pathname;
     } else {
       initHeaderNav();
     }
-    document.addEventListener("astro:page-load", () => {
-      setTimeout(initHeaderNav, 0);
-    });
   })();
 </script>
 

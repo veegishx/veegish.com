@@ -363,7 +363,13 @@ const recentEvents = await getRecentEvents();
       }
 
       initProjectsHoverAudio();
-      document.addEventListener("astro:page-load", initProjectsHoverAudio);
     })();
-  </script>
+
+    // Use multiple event types for robustness
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initProjectsHoverAudio);
+    } else {
+      initProjectsHoverAudio();
+    }
+  })();
 </Layout>

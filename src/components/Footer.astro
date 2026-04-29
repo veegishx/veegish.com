@@ -235,8 +235,12 @@ const year = date.getFullYear();
     quoteElement.textContent = randomQuote.quote;
   }
 
-  initFooterQuote();
-  document.addEventListener("astro:page-load", initFooterQuote);
+  // Use multiple event types for robustness
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFooterQuote);
+  } else {
+    initFooterQuote();
+  }
 
   (() => {
     const trigger = document.querySelector(".rights-reserved-trigger");

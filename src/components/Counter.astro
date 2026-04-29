@@ -22,6 +22,12 @@
     }
 
     initCounter();
-    document.addEventListener("astro:page-load", initCounter);
+
+    // Use multiple event types for robustness
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initCounter);
+    } else {
+      initCounter();
+    }
   })();
 </script>

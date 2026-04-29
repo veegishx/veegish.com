@@ -1,5 +1,4 @@
 ---
-import { ClientRouter } from "astro:transitions";
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import "../styles/global.css";
@@ -8,7 +7,6 @@ import "../styles/global.css";
 <!doctype html>
 <html lang="en">
   <head>
-    <ClientRouter />
     <!-- Theme detection - MUST be first to prevent flash -->
     <script is:inline>
       (() => {
@@ -39,23 +37,6 @@ import "../styles/global.css";
         })();
 
         applyTheme(theme);
-
-        document.addEventListener("astro:after-swap", () => {
-          const nextTheme = (() => {
-            if (
-              typeof localStorage !== "undefined" &&
-              localStorage.getItem("theme")
-            ) {
-              return localStorage.getItem("theme");
-            }
-            if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-              return "dark";
-            }
-            return "light";
-          })();
-
-          applyTheme(nextTheme);
-        });
       })();
     </script>
 
@@ -66,7 +47,6 @@ import "../styles/global.css";
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <meta name="apple-mobile-web-app-title" content="MyWebSite" />
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="generator" content={Astro.generator} />
     <link rel="preconnect" href="https://fonts.bunny.net" />
@@ -78,52 +58,10 @@ import "../styles/global.css";
     <slot name="head" />
   </head>
   <body class="zag-bg zag-text font-mono">
-    <div class="route-loader" aria-hidden="true" transition:persist>
-      <div class="route-loader-bar"></div>
-    </div>
-    <Header transition:persist />
+    <Header />
     <main>
       <slot />
     </main>
     <Footer />
-
-    <script is:inline>
-      (() => {
-        function initRouteLoader() {
-          if (window.__routeLoaderInitialized) return;
-
-          window.__routeLoaderShowTimer = null;
-
-          function clearShowTimer() {
-            if (window.__routeLoaderShowTimer) {
-              clearTimeout(window.__routeLoaderShowTimer);
-              window.__routeLoaderShowTimer = null;
-            }
-          }
-
-          function startLoader() {
-            const loader = document.querySelector(".route-loader");
-            if (!loader) return;
-
-            clearShowTimer();
-            window.__routeLoaderShowTimer = setTimeout(() => {
-              loader.classList.add("route-loader-active");
-            }, 100);
-          }
-
-          function stopLoader() {
-            const loader = document.querySelector(".route-loader");
-            clearShowTimer();
-            loader?.classList.remove("route-loader-active");
-          }
-
-          window.__routeLoaderInitialized = true;
-          document.addEventListener("astro:before-preparation", startLoader);
-          document.addEventListener("astro:page-load", stopLoader);
-        }
-
-        initRouteLoader();
-      })();
-    </script>
   </body>
 </html>

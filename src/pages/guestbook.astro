@@ -450,12 +450,7 @@ const messages = res.rows.map((r) => ({
 <script is:inline>
   function initGuestbookDensity() {
     let root = document.getElementById("gb-entries");
-
-    // Retry if root not found
-    if (!root) {
-      setTimeout(initGuestbookDensity, 100);
-      return;
-    }
+    if (!root) return;
 
     const normalize = (v) => (v === "compact" ? "compact" : "guestbook");
 
@@ -508,38 +503,24 @@ const messages = res.rows.map((r) => ({
     }
   }
 
-  // Use multiple event types for robustness
+  // Use DOMContentLoaded for robustness
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initGuestbookDensity);
   } else {
     initGuestbookDensity();
   }
-  document.addEventListener("astro:page-load", () => {
-    setTimeout(initGuestbookDensity, 0);
-  });
 </script>
 
 <script is:inline>
   function initGuestbookSort() {
     let root = document.getElementById("gb-entries");
-
-    // Retry if root not found
-    if (!root) {
-      setTimeout(initGuestbookSort, 100);
-      return;
-    }
+    if (!root) return;
 
     const list = root.querySelector(".gb-list");
-    if (!list) {
-      setTimeout(initGuestbookSort, 100);
-      return;
-    }
+    if (!list) return;
 
     const sortBtn = root.querySelector(".gb-sort-btn");
-    if (!sortBtn) {
-      setTimeout(initGuestbookSort, 100);
-      return;
-    }
+    if (!sortBtn) return;
 
     const sortIcon = sortBtn.querySelector(".sort-icon");
     const sortLabel = sortBtn.querySelector(".sort-label");
@@ -590,15 +571,12 @@ const messages = res.rows.map((r) => ({
     }
   }
 
-  // Use multiple event types for robustness
+  // Use DOMContentLoaded for robustness
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initGuestbookSort);
   } else {
     initGuestbookSort();
   }
-  document.addEventListener("astro:page-load", () => {
-    setTimeout(initGuestbookSort, 0);
-  });
 </script>
 
 <style>

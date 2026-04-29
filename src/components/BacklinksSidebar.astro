@@ -125,6 +125,12 @@ const backlinks = await getBacklinksForPost(slug);
 		}
 
 		initBacklinksSidebar();
-		document.addEventListener("astro:page-load", initBacklinksSidebar);
 	})();
+
+	// Use multiple event types for robustness
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", initBacklinksSidebar);
+	} else {
+		initBacklinksSidebar();
+	}
 </script>

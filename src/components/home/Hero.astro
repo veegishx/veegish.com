@@ -172,11 +172,12 @@ const { data: config } = await getConfigurationCollection();
       interval = setInterval(next, 2000);
     }
 
-    initChatBubble();
-    document.addEventListener("astro:page-load", () => {
-      clearInterval(interval);
+    // Use multiple event types for robustness
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initChatBubble);
+    } else {
       initChatBubble();
-    });
+    }
   })();
 
   (() => {
@@ -266,9 +267,13 @@ const { data: config } = await getConfigurationCollection();
 
     // Fallback: try immediately
     setTimeout(initFlashlight, 100);
-    document.addEventListener("astro:page-load", () => {
-      setTimeout(initFlashlight, 100);
-    });
+
+    // Use multiple event types for robustness
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(initFlashlight, 100);
+      });
+    }
   })();
   (() => {
     const chatBubble = document.querySelector(".chatbubble-wrapper");
