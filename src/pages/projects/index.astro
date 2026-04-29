@@ -338,38 +338,30 @@ const recentEvents = await getRecentEvents();
 
   <script is:inline>
     (() => {
-      function initProjectsHoverAudio() {
-        if (window.location.pathname !== "/projects") return;
+      const h1 = document.getElementById("projects-page-title");
+      if (!h1) return;
 
-        const title = document.getElementById("projects-page-title");
-        if (!title || title.dataset.bubbleAudioBound === "true") return;
+      const audio = new Audio("/potion_bubbles.mp3");
+      audio.volume = 0.5;
+      let mouseLeaveCalled = true;
 
-        const audio = new Audio("/potion_bubbles.mp3");
-        audio.loop = true;
+      h1.addEventListener("mouseenter", () => {
+        mouseLeaveCalled = false;
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+      });
 
-        function playAudio() {
+      h1.addEventListener("mouseleave", () => {
+        mouseLeaveCalled = true;
+        audio.pause();
+      });
+
+      audio.addEventListener("ended", () => {
+        if (!mouseLeaveCalled) {
           audio.currentTime = 0;
           audio.play().catch(() => {});
         }
-
-        function stopAudio() {
-          audio.pause();
-          audio.currentTime = 0;
-        }
-
-        title.dataset.bubbleAudioBound = "true";
-        title.addEventListener("mouseenter", playAudio);
-        title.addEventListener("mouseleave", stopAudio);
-      }
-
-      initProjectsHoverAudio();
+      });
     })();
-
-    // Use multiple event types for robustness
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", initProjectsHoverAudio);
-    } else {
-      initProjectsHoverAudio();
-    }
-  })();
+  </script>
 </Layout>

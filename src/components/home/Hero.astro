@@ -12,6 +12,7 @@ const { data: config } = await getConfigurationCollection();
   />
   <div class="relative">
     <h1
+      id="hero-title"
       class="text-3xl sm:text-4xl font-display font-semibold opsz text-center sm:text-left hero-wave-title"
       data-text={config.hero.title}
     >
@@ -232,7 +233,7 @@ const { data: config } = await getConfigurationCollection();
             const isLit = dist < 50;
             if (isLit) {
               // span.style.color = "#000000";
-              span.style.color = "oklch(58.5% 0.233 277.117)";
+              span.style.color = "oklch(0.9 0.2491 96.35)";
               span.style.textShadow =
                 "1px 1px 0 rgba(255, 255, 255, 0.15), 2px 2px 0 rgba(255, 255, 255, 0.1), 3px 3px 0 rgba(255, 255, 255, 0.05), 4px 4px 2px rgba(255, 255, 255, 0.025)";
               litCount++;
@@ -293,6 +294,32 @@ const { data: config } = await getConfigurationCollection();
 
     chatBubble.addEventListener("click", () => {
       window.open("https://youtu.be/dQw4w9WgXcQ", "_blank");
+    });
+  })();
+  (() => {
+    const h1 = document.querySelector("#hero-title");
+    if (!h1) return;
+
+    const audio = new Audio("/arcade-melody.mp3");
+    audio.volume = 0.5;
+    let mouseLeaveCalled = true;
+
+    h1.addEventListener("mouseenter", () => {
+      mouseLeaveCalled = false;
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    });
+
+    h1.addEventListener("mouseleave", () => {
+      mouseLeaveCalled = true;
+      audio.pause();
+    });
+
+    audio.addEventListener("ended", () => {
+      if (!mouseLeaveCalled) {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+      }
     });
   })();
 </script>

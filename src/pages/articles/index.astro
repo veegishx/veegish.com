@@ -49,7 +49,7 @@ const { data: config } = await getConfigurationCollection();
   </Fragment>
   <Section class="my-0">
     <div
-      id="sprite-hover"
+      id="article-page-title"
       class="flex flex-col md:flex-row items-center gap-4 pt-8 pb-16"
     >
       <span class="scroll-sprite inline-block flex-none" aria-hidden="true"
@@ -127,7 +127,7 @@ const { data: config } = await getConfigurationCollection();
       image-rendering: pixelated;
     }
 
-    #sprite-hover:hover .scroll-sprite {
+    #article-page-title:hover .scroll-sprite {
       animation: scroll-anim 2s steps(var(--scroll-frames)) infinite;
     }
 
@@ -144,7 +144,7 @@ const { data: config } = await getConfigurationCollection();
     }
 
     @media (prefers-reduced-motion: reduce) {
-      #sprite-hover:hover .scroll-sprite {
+      #article-page-title:hover .scroll-sprite {
         animation: none;
       }
     }
@@ -265,24 +265,31 @@ const { data: config } = await getConfigurationCollection();
   </style>
 
   <script is:inline>
-    const spriteHover = document.getElementById("sprite-hover");
-    if (spriteHover) {
+    (() => {
+      const h1 = document.getElementById("article-page-title");
+      if (!h1) return;
+
       const audio = new Audio("/parchment.mp3");
       audio.volume = 0.5;
-      let lastPlayed = 0;
+      let mouseLeaveCalled = true;
 
-      spriteHover.addEventListener("mouseenter", () => {
-        const now = Date.now();
-        if (now - lastPlayed < 500) return;
-        lastPlayed = now;
+      h1.addEventListener("mouseenter", () => {
+        mouseLeaveCalled = false;
         audio.currentTime = 0;
         audio.play().catch(() => {});
       });
 
-      spriteHover.addEventListener("mouseleave", () => {
+      h1.addEventListener("mouseleave", () => {
+        mouseLeaveCalled = true;
         audio.pause();
-        audio.currentTime = 0;
       });
-    }
+
+      audio.addEventListener("ended", () => {
+        if (!mouseLeaveCalled) {
+          audio.currentTime = 0;
+          audio.play().catch(() => {});
+        }
+      });
+    })();
   </script>
 </Layout>
