@@ -34,6 +34,7 @@ cardImage = "https://avatars.githubusercontent.com/u/8150534"
 [_.hero]
 title = "Veegish"
 subtitle = "A personal space for my thoughts, projects, and journey"
+extraText= "As a software engineer, a big part of my job is fixing bugs, solving performance issues and making sure that the code is clean and maintainable. This site is the opposite of that. Enjoy the bugs, the added performance overheads and the lack of concern for high standards. I'm not sorry."
 image = "https://avatars.githubusercontent.com/u/8150534"
 ctaText = "View Projects"
 ctaUrl = "/projects"

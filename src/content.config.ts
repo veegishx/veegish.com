@@ -156,6 +156,11 @@ const configuration = defineCollection({
       subtitle: z.string().default("My personal space"),
 
       /**
+       * The extra text displayed in the hero section.
+       */
+      extraText: z.string().default("My personal space"),
+
+      /**
        * The URL of the hero image, used as a background image in the hero section.
        */
       image: z.url().optional(),
