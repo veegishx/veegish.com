@@ -449,10 +449,14 @@ const messages = res.rows.map((r) => ({
 
 <script is:inline>
   function initGuestbookDensity() {
-    const root = document.getElementById("gb-entries");
-    if (!root) return;
+    let root = document.getElementById("gb-entries");
 
-    const buttons = Array.from(root.querySelectorAll("[data-density-btn]"));
+    // Retry if root not found
+    if (!root) {
+      setTimeout(initGuestbookDensity, 100);
+      return;
+    }
+
     const normalize = (v) => (v === "compact" ? "compact" : "guestbook");
 
     function safeGet(key) {
@@ -474,6 +478,9 @@ const messages = res.rows.map((r) => ({
     function apply(next) {
       const density = normalize(next);
       root.dataset.density = density;
+
+      // Query buttons each time (in case DOM changed)
+      const buttons = Array.from(root.querySelectorAll("[data-density-btn]"));
       for (const btn of buttons) {
         const val = btn.getAttribute("data-density-btn");
         const active = val === density;
@@ -482,11 +489,17 @@ const messages = res.rows.map((r) => ({
       }
     }
 
+    // Apply saved preference
     const saved = safeGet("guestbookDensity");
-    apply(saved);
+    apply(saved || "guestbook"); // Default to "guestbook"
 
-    for (const btn of buttons) {
-      btn.addEventListener("click", () => {
+    // Use event delegation on the toggle row (more robust)
+    const toggleRow = root.querySelector(".gb-toggle-row");
+    if (toggleRow && !toggleRow.dataset.bound) {
+      toggleRow.dataset.bound = "true";
+      toggleRow.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-density-btn]");
+        if (!btn) return;
         const next = btn.getAttribute("data-density-btn");
         if (!next) return;
         apply(next);
@@ -495,20 +508,38 @@ const messages = res.rows.map((r) => ({
     }
   }
 
-  initGuestbookDensity();
-  document.addEventListener("astro:page-load", initGuestbookDensity);
+  // Use multiple event types for robustness
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initGuestbookDensity);
+  } else {
+    initGuestbookDensity();
+  }
+  document.addEventListener("astro:page-load", () => {
+    setTimeout(initGuestbookDensity, 0);
+  });
 </script>
 
 <script is:inline>
   function initGuestbookSort() {
-    const root = document.getElementById("gb-entries");
-    if (!root) return;
+    let root = document.getElementById("gb-entries");
+
+    // Retry if root not found
+    if (!root) {
+      setTimeout(initGuestbookSort, 100);
+      return;
+    }
 
     const list = root.querySelector(".gb-list");
-    if (!list) return;
+    if (!list) {
+      setTimeout(initGuestbookSort, 100);
+      return;
+    }
 
     const sortBtn = root.querySelector(".gb-sort-btn");
-    if (!sortBtn) return;
+    if (!sortBtn) {
+      setTimeout(initGuestbookSort, 100);
+      return;
+    }
 
     const sortIcon = sortBtn.querySelector(".sort-icon");
     const sortLabel = sortBtn.querySelector(".sort-label");
@@ -546,18 +577,28 @@ const messages = res.rows.map((r) => ({
     const saved = safeGet("guestbookSort") || "desc";
     applySort(saved);
 
-    const newHandler = () => {
-      const next = sortBtn.dataset.sort === "desc" ? "asc" : "desc";
-      applySort(next);
-      safeSet("guestbookSort", next);
-    };
-    sortBtn.removeEventListener("click", sortBtn._sortHandler);
-    sortBtn._sortHandler = newHandler;
-    sortBtn.addEventListener("click", newHandler);
+    // Use event delegation on root
+    if (!root.dataset.sortBound) {
+      root.dataset.sortBound = "true";
+      root.addEventListener("click", (e) => {
+        if (e.target.closest(".gb-sort-btn")) {
+          const next = sortBtn.dataset.sort === "desc" ? "asc" : "desc";
+          applySort(next);
+          safeSet("guestbookSort", next);
+        }
+      });
+    }
   }
 
-  initGuestbookSort();
-  document.addEventListener("astro:page-load", initGuestbookSort);
+  // Use multiple event types for robustness
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initGuestbookSort);
+  } else {
+    initGuestbookSort();
+  }
+  document.addEventListener("astro:page-load", () => {
+    setTimeout(initGuestbookSort, 0);
+  });
 </script>
 
 <style>
