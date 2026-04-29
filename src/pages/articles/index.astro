@@ -57,7 +57,9 @@ const { data: config } = await getConfigurationCollection();
       <div
         class="w-full flex flex-col items-center md:items-center md:flex-row md:justify-between gap-2"
       >
-        <h1 class="page-title-glow font-display text-2xl sm:text-4xl leading-loose">
+        <h1
+          class="page-title-glow font-display text-2xl sm:text-4xl leading-loose"
+        >
           {config.texts.articlesName}
         </h1>
         <a
@@ -155,7 +157,9 @@ const { data: config } = await getConfigurationCollection();
     }
 
     @keyframes glow-flicker {
-      0%, 70%, 100% {
+      0%,
+      70%,
+      100% {
         text-shadow:
           0 0 8px rgba(255, 255, 255, 0.35),
           0 0 18px rgba(255, 255, 255, 0.18);
@@ -210,7 +214,9 @@ const { data: config } = await getConfigurationCollection();
     }
 
     @keyframes glow-flicker-dark {
-      0%, 70%, 100% {
+      0%,
+      70%,
+      100% {
         text-shadow:
           0 0 10px rgba(255, 255, 255, 0.45),
           0 0 22px rgba(255, 255, 255, 0.24);

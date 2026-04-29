@@ -7,15 +7,18 @@ import {
   getConfigurationCollection,
   getRepositories,
   getRecentEvents,
+  getRecentCommits,
 } from "../../lib/utils";
 import RepositoryCard from "../../components/github/RepositoryCard";
 import ActivityFeed from "../../components/github/ActivityFeed";
+import CommitList from "../../components/github/CommitList";
 // import ContributionCalendar from "../../components/github/ContributionCalendar";
 
 const { data: config } = await getConfigurationCollection();
 
 const repositories = await getRepositories();
 const recentEvents = await getRecentEvents();
+// const recentCommits = await getRecentCommits();
 ---
 
 <Layout>
@@ -159,6 +162,17 @@ const recentEvents = await getRecentEvents();
         )
       }
     </section>
+
+    <!-- <section>
+      <h2 class="text-xl font-display mb-6">Recent Commits</h2>
+      {
+        recentCommits.length > 0 ? (
+          <CommitList commits={recentCommits} />
+        ) : (
+          <p class="text-zinc-500 dark:text-zinc-400">No recent commits</p>
+        )
+      }
+    </section> -->
   </Section>
 
   <style>

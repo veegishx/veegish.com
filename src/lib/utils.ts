@@ -41,18 +41,20 @@ export const getConfigurationCollection = async (): Promise<
 };
 
 export {
-	getRepositories,
-	getRecentEvents,
-	getContributions,
-	getEventIcon,
-	getEventDescription,
-	formatDate,
-	getLanguageColor,
+  getRepositories,
+  getRecentEvents,
+  getRecentCommits,
+  getContributions,
+  getEventIcon,
+  getEventDescription,
+  formatDate,
+  getLanguageColor,
 } from "./github";
 
 export type {
-	Repository,
-	GitHubEvent,
-	ContributionDay,
-	ContributionData,
+  Repository,
+  GitHubEvent,
+  ContributionDay,
+  ContributionData,
+  Commit,
 } from "./github";
