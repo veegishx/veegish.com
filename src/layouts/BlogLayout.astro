@@ -6,6 +6,7 @@ import BacklinksSidebar from "../components/BacklinksSidebar.astro";
 import type { ArticleFrontmatter } from "../lib/types";
 import { getConfigurationCollection, processArticleDate, calculateReadingTime } from "../lib/utils";
 import Layout from "./Layout.astro";
+import features from "../../content/features.json" with { type: "json" };
 
 type Props = { frontmatter: ArticleFrontmatter; body?: string };
 
@@ -77,4 +78,203 @@ const { data: config } = await getConfigurationCollection();
     <p class="pt-8">~{config.personal.name}</p>
   </Section>
   <BacklinksSidebar slug={frontmatter.slug} />
+
+  {
+    features.linkPreviews && (
+      <Fragment>
+        <div
+          id="link-preview-popup"
+          class="fixed z-50 hidden w-80 rounded-lg border border-zinc-300 bg-white p-0 shadow-xl dark:border-zinc-700 dark:bg-zinc-900 overflow-hidden"
+        >
+          <div class="relative w-full aspect-video bg-zinc-200 dark:bg-zinc-800">
+            <img
+              id="link-preview-image"
+              src=""
+              alt=""
+              class="w-full h-full object-cover"
+              loading="lazy"
+              onerror="this.style.display='none'"
+            />
+            <img
+              id="link-preview-favicon"
+              src=""
+              alt=""
+              class="absolute bottom-2 left-2 w-5 h-5 rounded-sm bg-white dark:bg-zinc-800 p-0.5"
+              onerror="this.style.display='none'"
+            />
+          </div>
+          <div class="p-3">
+            <p
+              id="link-preview-title"
+              class="text-sm font-semibold text-zag-dark dark:text-zag-light line-clamp-2"
+            ></p>
+            <p
+              id="link-preview-desc"
+              class="mt-1 text-xs text-zag-dark-muted dark:text-zag-light-muted line-clamp-3"
+            ></p>
+          </div>
+        </div>
+
+        <script is:inline>
+          (() => {
+            const popup = document.getElementById("link-preview-popup");
+            const previewImg = document.getElementById("link-preview-image");
+            const faviconImg = document.getElementById("link-preview-favicon");
+            const titleEl = document.getElementById("link-preview-title");
+            const descEl = document.getElementById("link-preview-desc");
+            if (!popup) return;
+
+            const siteUrl = window.location.origin;
+            const cache = new Map();
+            const pending = new Map();
+            let currentLink = null;
+            let hideTimer = null;
+            let isOverPopup = false;
+
+            function positionPopup(link) {
+              const rect = link.getBoundingClientRect();
+              const popupRect = popup.getBoundingClientRect();
+              const viewportW = window.innerWidth;
+              const viewportH = window.innerHeight;
+              const gap = 12;
+
+              let top = rect.bottom + gap;
+              let left = rect.left;
+
+              if (top + popupRect.height > viewportH) {
+                top = rect.top - popupRect.height - gap;
+              }
+              if (left + popupRect.width > viewportW) {
+                left = viewportW - popupRect.width - 16;
+              }
+              if (left < 16) left = 16;
+              if (top < 16) top = 16;
+
+              popup.style.top = `${top}px`;
+              popup.style.left = `${left}px`;
+            }
+
+            function showPopup(link) {
+              if (hideTimer) clearTimeout(hideTimer);
+              currentLink = link;
+
+              titleEl.textContent = "Loading...";
+              descEl.textContent = "";
+              previewImg.style.display = "block";
+              previewImg.src = "";
+              faviconImg.style.display = "none";
+              faviconImg.src = "";
+
+              popup.classList.remove("hidden");
+              popup.style.display = "block";
+              positionPopup(link);
+
+              const href = link.href;
+
+              if (cache.has(href)) {
+                renderPreview(cache.get(href));
+                return;
+              }
+
+              if (pending.has(href)) {
+                pending.get(href).then((data) => {
+                  if (currentLink === link) renderPreview(data);
+                });
+                return;
+              }
+
+              const promise = fetch(`/api/link-preview?url=${encodeURIComponent(href)}`)
+                .then((r) => r.json().then((data) => ({ ok: r.ok, data })))
+                .then(({ ok, data }) => {
+                  pending.delete(href);
+                  if (!ok) {
+                    const result = { error: data.error || "Failed to fetch preview" };
+                    cache.set(href, result);
+                    return result;
+                  }
+                  cache.set(href, data);
+                  return data;
+                })
+                .catch(() => {
+                  pending.delete(href);
+                  const result = { error: "Network error. Try again later." };
+                  cache.set(href, result);
+                  return result;
+                });
+
+              pending.set(href, promise);
+              promise.then((data) => {
+                if (currentLink === link) renderPreview(data);
+              });
+            }
+
+            function renderPreview(data) {
+              if (!currentLink) return;
+
+              if (data.error) {
+                titleEl.textContent = "Preview unavailable";
+                descEl.textContent = data.error;
+                previewImg.style.display = "none";
+                faviconImg.style.display = "none";
+                positionPopup(currentLink);
+                return;
+              }
+
+              titleEl.textContent = data.title || data.url;
+              descEl.textContent = data.description || "";
+
+              if (data.image) {
+                previewImg.src = data.image;
+                previewImg.style.display = "block";
+              } else {
+                previewImg.style.display = "none";
+              }
+
+              if (data.favicon) {
+                faviconImg.src = data.favicon;
+                faviconImg.style.display = "block";
+              } else {
+                faviconImg.style.display = "none";
+              }
+
+              positionPopup(currentLink);
+            }
+
+            function hidePopup() {
+              hideTimer = setTimeout(() => {
+                if (!isOverPopup) {
+                  popup.style.display = "none";
+                  popup.classList.add("hidden");
+                  currentLink = null;
+                }
+              }, 100);
+            }
+
+            popup.addEventListener("mouseenter", () => {
+              isOverPopup = true;
+              if (hideTimer) clearTimeout(hideTimer);
+            });
+
+            popup.addEventListener("mouseleave", () => {
+              isOverPopup = false;
+              hidePopup();
+            });
+
+            const links = document.querySelectorAll(".prose a[href^='http']");
+            links.forEach((link) => {
+              if (link.href.startsWith(siteUrl)) return;
+
+              link.addEventListener("mouseenter", () => {
+                showPopup(link);
+              });
+
+              link.addEventListener("mouseleave", () => {
+                hidePopup();
+              });
+            });
+          })();
+        </script>
+      </Fragment>
+    )
+  }
 </Layout>
