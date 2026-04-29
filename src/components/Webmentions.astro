@@ -1,0 +1,185 @@
+---
+import type { GroupedWebmentions, WebmentionEntry } from "../lib/webmentions";
+
+type Props = {
+  mentions: GroupedWebmentions;
+  targetUrl: string;
+};
+
+const { mentions, targetUrl } = Astro.props;
+
+const reactionCount = mentions.likes.length + mentions.reposts.length + mentions.bookmarks.length;
+
+const MAX_AVATARS = 5;
+
+function extractName(entry: WebmentionEntry): string {
+  return entry.author?.name || new URL(entry.url).hostname;
+}
+
+function extractPhoto(entry: WebmentionEntry): string | null {
+  return entry.author?.photo || null;
+}
+
+function sanitizeContent(entry: WebmentionEntry): string {
+  const raw = entry.content?.text || entry.content?.html || "";
+  if (!raw) return "";
+  const text = raw.replace(/<[^>]*>/g, "");
+  return text.length > 280 ? text.slice(0, 280) + "…" : text;
+}
+
+function formatDate(dateStr?: string): string {
+  if (!dateStr) return "";
+  try {
+    return new Date(dateStr).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  } catch {
+    return "";
+  }
+}
+
+function getReactionLabel(): string {
+  const parts: string[] = [];
+  if (mentions.likes.length > 0) parts.push("liked");
+  if (mentions.reposts.length > 0) parts.push("reposted");
+  if (mentions.bookmarks.length > 0) parts.push("bookmarked");
+  return parts.length > 0 ? parts.join(" and ") + " this" : "";
+}
+
+function getVisibleReactions(): { photo: string | null; name: string; entry: WebmentionEntry }[] {
+  const all = [...mentions.likes, ...mentions.reposts, ...mentions.bookmarks];
+  return all.slice(0, MAX_AVATARS).map((entry) => ({
+    photo: extractPhoto(entry),
+    name: extractName(entry),
+    entry,
+  }));
+}
+
+function getRemainingCount(): number {
+  const total = mentions.likes.length + mentions.reposts.length + mentions.bookmarks.length;
+  return Math.max(0, total - MAX_AVATARS);
+}
+---
+
+{
+  reactionCount > 0 && (
+    <div id="webmentions-container" data-target-url={targetUrl} class="mt-12 mb-8">
+      <div class="zag-border-b zag-transition pb-4">
+        <h2 class="text-lg font-display mb-4">Reactions</h2>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <div class="flex -space-x-2">
+            {
+              getVisibleReactions().map((r, i) => (
+                <a
+                  href={r.entry.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={`${r.name} ${getReactionLabel()}`}
+                  class="block w-8 h-8 rounded-full bg-zinc-300 dark:bg-zinc-700 ring-2 ring-zag-bg overflow-hidden flex-shrink-0"
+                >
+                  {
+                    r.photo ? (
+                      <img
+                        src={r.photo}
+                        alt={r.name}
+                        class="w-full h-full object-cover"
+                        loading="lazy"
+                        onerror="this.parentElement.style.display='none'"
+                      />
+                    ) : (
+                      <span class="w-full h-full flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-300">
+                        {r.name.charAt(0).toUpperCase()}
+                      </span>
+                    )
+                  }
+                </a>
+              ))
+            }
+            {
+              getRemainingCount() > 0 && (
+                <span class="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 ring-2 ring-zag-bg flex items-center justify-center text-xs font-medium text-zag-dark-muted">
+                  +{getRemainingCount()}
+                </span>
+              )
+            }
+          </div>
+
+          <span class="text-sm text-zag-dark-muted">
+            <span class="reaction-text">{reactionCount} {reactionCount === 1 ? "person" : "people"} {getReactionLabel()}</span>
+          </span>
+        </div>
+      </div>
+
+      {
+        mentions.replies.length > 0 && (
+          <div class="mt-6 zag-border-b zag-transition pb-4">
+            <h3 class="text-base font-display mb-4">Replies</h3>
+            <div class="flex flex-col gap-4">
+              {
+                mentions.replies.map((reply) => {
+                  const name = extractName(reply);
+                  const photo = extractPhoto(reply);
+                  const content = sanitizeContent(reply);
+                  const date = formatDate(reply.published || reply["wm-received"]);
+
+                  return (
+                    <div
+                      data-wm-id={reply["wm-id"]}
+                      class="flex gap-3 p-3 bg-zinc-50 dark:bg-zinc-900 rounded-lg zag-transition"
+                    >
+                      <a
+                        href={reply.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="flex-shrink-0 w-10 h-10 rounded-full bg-zinc-300 dark:bg-zinc-700 overflow-hidden"
+                      >
+                        {
+                          photo ? (
+                            <img
+                              src={photo}
+                              alt={name}
+                              class="w-full h-full object-cover"
+                              loading="lazy"
+                              onerror="this.parentElement.style.display='none'"
+                            />
+                          ) : (
+                            <span class="w-full h-full flex items-center justify-center text-sm font-bold text-zinc-600 dark:text-zinc-300">
+                              {name.charAt(0).toUpperCase()}
+                            </span>
+                          )
+                        }
+                      </a>
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                          <a
+                            href={reply.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-sm font-semibold text-zag-dark dark:text-zag-light hover:text-zag-accent-dark dark:hover:text-zag-accent-light zag-transition"
+                          >
+                            {name}
+                          </a>
+                          {date && (
+                            <span class="text-xs text-zag-dark-muted">{date}</span>
+                          )}
+                        </div>
+                        {content && (
+                          <p class="mt-1 text-sm text-zag-dark-muted leading-relaxed line-clamp-3">
+                            {content}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              }
+            </div>
+          </div>
+        )
+      }
+    </div>
+  )
+}

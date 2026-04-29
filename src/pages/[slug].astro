@@ -1,29 +1,36 @@
 ---
-
 import { getCollection, render } from "astro:content";
 import BlogLayout from "../layouts/BlogLayout.astro";
 import { getConfigurationCollection } from "../lib/utils";
+import { fetchWebmentions } from "../lib/webmentions";
 
 export async function getStaticPaths() {
 	const posts = await getCollection("blog", (e) => e.data.published === true);
 	const { data: config } = await getConfigurationCollection();
-	return posts.map((article) => ({
-		params: { slug: article.data.slug },
-		props: {
-			article: {
-				...article,
-				data: {
-					...article.data,
-					url: `${config.site.baseUrl}/${article.data.slug}`,
+	const results = await Promise.all(
+		posts.map(async (article) => {
+			const articleUrl = `${config.site.baseUrl}/${article.data.slug}`;
+			return {
+				params: { slug: article.data.slug },
+				props: {
+					article: {
+						...article,
+						data: {
+							...article.data,
+							url: articleUrl,
+						},
+					},
+					webmentions: await fetchWebmentions(articleUrl),
 				},
-			},
-		},
-	}));
+			};
+		})
+	);
+	return results;
 }
 
-const { article } = Astro.props;
+const { article, webmentions } = Astro.props;
 const { Content } = await render(article);
 ---
-<BlogLayout frontmatter={article.data} body={article.body}>
+<BlogLayout frontmatter={article.data} body={article.body} webmentions={webmentions}>
   <Content />
 </BlogLayout>

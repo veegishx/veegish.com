@@ -3,16 +3,19 @@ import Section from "../components/common/Section.astro";
 import Prose from "../components/Prose.astro";
 import Backlinks from "../components/Backlinks.astro";
 import BacklinksSidebar from "../components/BacklinksSidebar.astro";
+import Webmentions from "../components/Webmentions.astro";
 import type { ArticleFrontmatter } from "../lib/types";
+import type { GroupedWebmentions } from "../lib/webmentions";
 import { getConfigurationCollection, processArticleDate, calculateReadingTime } from "../lib/utils";
 import Layout from "./Layout.astro";
 import features from "../../content/features.json" with { type: "json" };
 
-type Props = { frontmatter: ArticleFrontmatter; body?: string };
+type Props = { frontmatter: ArticleFrontmatter; body?: string; webmentions?: GroupedWebmentions };
 
-const { frontmatter, body } = Astro.props;
+const { frontmatter, body, webmentions = { likes: [], reposts: [], replies: [], bookmarks: [] } } = Astro.props;
 const articleDate = processArticleDate(frontmatter.timestamp);
 const { data: config } = await getConfigurationCollection();
+const articleUrl = frontmatter.url ?? `${config.site.baseUrl}/${frontmatter.slug}`;
 ---
 
 <Layout>
@@ -96,10 +99,64 @@ const { data: config } = await getConfigurationCollection();
         <slot />
       </Prose>
       <Backlinks slug={frontmatter.slug} />
+      <Webmentions mentions={webmentions} targetUrl={articleUrl} />
       <p class="pt-8">~{config.personal.name}</p>
     </article>
   </Section>
   <BacklinksSidebar slug={frontmatter.slug} />
+
+  <script is:inline>
+    (() => {
+      const container = document.getElementById("webmentions-container");
+      if (!container) return;
+
+      const targetUrl = container.dataset.targetUrl;
+      if (!targetUrl) return;
+
+      const existingIds = new Set(
+        Array.from(document.querySelectorAll("[data-wm-id]"))
+          .map((el) => el.dataset.wmId)
+          .filter(Boolean)
+      );
+
+      fetch(`https://webmention.io/api/mentions.jf2?target=${encodeURIComponent(targetUrl)}`)
+        .then((r) => r.json())
+        .then((data) => {
+          const newEntries = (data.children || []).filter(
+            (e) => e["wm-id"] && !existingIds.has(String(e["wm-id"]))
+          );
+
+          if (newEntries.length === 0) return;
+
+          const reactionsContainer = container.querySelector(".reaction-text");
+          if (reactionsContainer) {
+            const currentMatch = reactionsContainer.textContent.match(/^(\d+)/);
+            const currentCount = currentMatch ? parseInt(currentMatch[1], 10) : 0;
+            const newReactionCount = newEntries.filter(
+              (e) => e["wm-property"] === "like-of" || e["wm-property"] === "repost-of" || e["wm-property"] === "bookmark-of"
+            ).length;
+            const totalCount = currentCount + newReactionCount;
+            reactionsContainer.textContent = `${totalCount} ${totalCount === 1 ? "person" : "people"} reacted to this`;
+          }
+
+          const repliesSection = container.querySelector(".flex.flex-col.gap-4");
+          const existingRepliesSection = repliesSection?.closest(".zag-border-b");
+
+          if (newEntries.filter((e) => e["wm-property"] === "in-reply-to").length > 0) {
+            if (!existingRepliesSection) {
+              const newSection = document.createElement("div");
+              newSection.className = "mt-6 zag-border-b zag-transition pb-4";
+              newSection.innerHTML = `<h3 class="text-base font-display mb-4">Replies</h3>`;
+              const replyList = document.createElement("div");
+              replyList.className = "flex flex-col gap-4";
+              newSection.appendChild(replyList);
+              container.appendChild(newSection);
+            }
+          }
+        })
+        .catch(() => {});
+    })();
+  </script>
 
   {
     features.linkPreviews && (
