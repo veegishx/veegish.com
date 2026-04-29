@@ -107,7 +107,7 @@ export default function ActivityFeed({ events }: ActivityFeedProps) {
 					rel="noopener noreferrer"
 					className="flex items-start gap-3 p-3 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors group"
 				>
-					<span className="flex-shrink-0 p-2 bg-zinc-100 dark:bg-zinc-800 rounded-full text-zinc-600 dark:text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+					<span className="flex-shrink-0 p-2 bg-zinc-100 dark:bg-zinc-800 rounded-full text-zinc-600 dark:text-zinc-400 group-hover:text-(--color-zag-accent-dark) dark:group-hover:text-(--color-zag-accent-light)">
 						<EventIcon type={event.type} />
 					</span>
 					<div className="flex-1 min-w-0">

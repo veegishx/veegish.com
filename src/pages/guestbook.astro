@@ -173,10 +173,12 @@ const messages = res.rows.map((r) => ({
               <span class="sort-icon font-mono text-xs">↓</span>
             </button>
           </div>
-          <p class="gb-ascii font-mono text-xs sm:text-sm leading-0">
+          <p class="gb-ascii santa font-mono text-xs sm:text-sm leading-0">
             [ SANTA WAS HERE ]
           </p>
-          <span class="text-[10px] absolute -bottom-6 right-0">allegedly</span>
+          <span class="text-[10px] santa-allegedly absolute -bottom-3 right-0"
+            >allegedly</span
+          >
         </div>
 
         <div class="gb-toggle-row" aria-label="Entries density">
@@ -446,7 +448,7 @@ const messages = res.rows.map((r) => ({
 </script>
 
 <script is:inline>
-  (() => {
+  function initGuestbookDensity() {
     const root = document.getElementById("gb-entries");
     if (!root) return;
 
@@ -491,11 +493,14 @@ const messages = res.rows.map((r) => ({
         safeSet("guestbookDensity", normalize(next));
       });
     }
-  })();
+  }
+
+  initGuestbookDensity();
+  document.addEventListener("astro:page-load", initGuestbookDensity);
 </script>
 
 <script is:inline>
-  (() => {
+  function initGuestbookSort() {
     const root = document.getElementById("gb-entries");
     if (!root) return;
 
@@ -541,12 +546,18 @@ const messages = res.rows.map((r) => ({
     const saved = safeGet("guestbookSort") || "desc";
     applySort(saved);
 
-    sortBtn.addEventListener("click", () => {
+    const newHandler = () => {
       const next = sortBtn.dataset.sort === "desc" ? "asc" : "desc";
       applySort(next);
       safeSet("guestbookSort", next);
-    });
-  })();
+    };
+    sortBtn.removeEventListener("click", sortBtn._sortHandler);
+    sortBtn._sortHandler = newHandler;
+    sortBtn.addEventListener("click", newHandler);
+  }
+
+  initGuestbookSort();
+  document.addEventListener("astro:page-load", initGuestbookSort);
 </script>
 
 <style>
@@ -713,6 +724,12 @@ const messages = res.rows.map((r) => ({
   .gb-link {
     text-decoration: underline;
     text-underline-offset: var(--zag-offset);
+  }
+  .gb-link:hover {
+    color: var(--color-zag-accent-dark);
+  }
+  :where(.dark, .dark *) .gb-link:hover {
+    color: var(--color-zag-accent-light);
   }
   .gb-message {
     white-space: pre-wrap;
@@ -891,5 +908,14 @@ const messages = res.rows.map((r) => ({
         0 0 10px rgba(255, 255, 255, 0.45),
         0 0 22px rgba(255, 255, 255, 0.24);
     }
+  }
+
+  .santa-allegedly {
+    opacity: 0;
+    text-shadow: none;
+  }
+  .santa:hover + .santa-allegedly {
+    opacity: 1;
+    text-shadow: none;
   }
 </style>

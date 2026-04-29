@@ -4,6 +4,7 @@ import Anchor from "./common/Anchor.astro";
 import ThemeToggle from "./ThemeToggle.astro";
 
 const { data: config } = await getConfigurationCollection();
+const currentPath = Astro.url.pathname;
 ---
 
 <header class="zag-bg zag-border-b sticky top-0 w-full z-10">
@@ -38,9 +39,10 @@ const { data: config } = await getConfigurationCollection();
       class="flex flex-col font-mono font-medium gap-4 sm:flex-row px-4 sm:px-0 mt-16 sm:mt-0"
     >
       {
-        Object.entries(config.menu).map((i) => (
-          <Anchor url={i[1]}>{i[0]}</Anchor>
-        ))
+        Object.entries(config.menu).map((i) => {
+          const isActive = currentPath === i[1] || (i[1] !== '/' && currentPath.startsWith(i[1]));
+          return <Anchor url={i[1]} class:list={[isActive && 'anchor-active']}>{i[0]}</Anchor>;
+        })
       }
     </div>
     <div class="flex items-center gap-4 justify-between px-4 sm:px-0" title="guestbook">
@@ -207,6 +209,13 @@ const { data: config } = await getConfigurationCollection();
 
   .gb-icon.wiggling {
     animation: wiggle 0.3s ease-in-out;
+  }
+
+  .anchor-active {
+    color: var(--color-zag-accent-dark);
+  }
+  :where(.dark, .dark *) .anchor-active {
+    color: var(--color-zag-accent-light);
   }
 
   @media (min-width: 640px) {
