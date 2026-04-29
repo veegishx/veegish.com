@@ -162,7 +162,17 @@ const messages = res.rows.map((r) => ({
         class="flex flex-col gap-3 sm:flex-row items-baseline md:items-center justify-between sm:gap-4 mb-4"
       >
         <div class="w-full flex items-baseline justify-between gap-4 relative">
-          <p class="font-display text-lg leading-0">ENTRIES</p>
+          <div class="flex items-center gap-2">
+            <p class="font-display text-lg leading-0">ENTRIES</p>
+            <button
+              type="button"
+              class="gb-sort-btn"
+              aria-label="Toggle sort order by date"
+              data-sort="desc"
+            >
+              <span class="sort-icon font-mono text-xs">↓</span>
+            </button>
+          </div>
           <p class="gb-ascii font-mono text-xs sm:text-sm leading-0">
             [ SANTA WAS HERE ]
           </p>
@@ -197,7 +207,7 @@ const messages = res.rows.map((r) => ({
         ) : (
           <ol class="gb-list grid gap-4">
             {messages.map((m) => (
-              <li class="gb-entry p-4 sm:p-5">
+              <li class="gb-entry p-4 sm:p-5" data-created-at={m.createdAt}>
                 <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2">
                   <p class="font-mono text-sm">
                     <span class="gb-name">{m.name}</span>
@@ -484,6 +494,61 @@ const messages = res.rows.map((r) => ({
   })();
 </script>
 
+<script is:inline>
+  (() => {
+    const root = document.getElementById("gb-entries");
+    if (!root) return;
+
+    const list = root.querySelector(".gb-list");
+    if (!list) return;
+
+    const sortBtn = root.querySelector(".gb-sort-btn");
+    if (!sortBtn) return;
+
+    const sortIcon = sortBtn.querySelector(".sort-icon");
+    const sortLabel = sortBtn.querySelector(".sort-label");
+
+    function safeGet(key) {
+      try {
+        return localStorage.getItem(key);
+      } catch {
+        return null;
+      }
+    }
+    function safeSet(key, value) {
+      try {
+        localStorage.setItem(key, value);
+      } catch {
+        /* ignore */
+      }
+    }
+
+    function applySort(order) {
+      const items = Array.from(list.querySelectorAll("li[data-created-at]"));
+      items.sort((a, b) => {
+        const ta = Number(a.dataset.createdAt);
+        const tb = Number(b.dataset.createdAt);
+        return order === "asc" ? ta - tb : tb - ta;
+      });
+      items.forEach((item) => list.appendChild(item));
+
+      sortBtn.dataset.sort = order;
+      if (sortIcon) sortIcon.textContent = order === "asc" ? "↑" : "↓";
+      if (sortLabel)
+        sortLabel.textContent = order === "asc" ? "Oldest" : "Newest";
+    }
+
+    const saved = safeGet("guestbookSort") || "desc";
+    applySort(saved);
+
+    sortBtn.addEventListener("click", () => {
+      const next = sortBtn.dataset.sort === "desc" ? "asc" : "desc";
+      applySort(next);
+      safeSet("guestbookSort", next);
+    });
+  })();
+</script>
+
 <style>
   .gb-panel {
     border: var(--zag-stroke) solid;
@@ -530,6 +595,23 @@ const messages = res.rows.map((r) => ({
     display: flex;
     gap: 0.5rem;
     align-items: center;
+  }
+  .gb-sort-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    border: none;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    color: var(--color-zag-dark);
+    user-select: none;
+  }
+  :where(.dark, .dark *) .gb-sort-btn {
+    border-color: var(--color-zag-light);
+    color: var(--color-zag-light);
+  }
+  .gb-sort-btn:hover {
+    background: color-mix(in oklab, currentColor 8%, transparent);
   }
   .gb-toggle {
     padding: 0.65rem 0.75rem;
