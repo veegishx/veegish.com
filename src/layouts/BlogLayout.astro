@@ -121,6 +121,28 @@ const articleUrl = frontmatter.url ?? `${config.site.baseUrl}/${frontmatter.slug
 
       const escapeHtml = (s) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 
+      const SOCIAL_ICONS = {
+        'bsky.social': 'https://cdn.simpleicons.org/bluesky',
+        'reddit.com': 'https://cdn.simpleicons.org/reddit',
+        'twitter.com': 'https://cdn.simpleicons.org/x',
+        'x.com': 'https://cdn.simpleicons.org/x',
+        'mastodon': 'https://cdn.simpleicons.org/mastodon',
+        'linkedin.com': 'https://cdn.simpleicons.org/linkedin',
+        'github.com': 'https://cdn.simpleicons.org/github',
+      };
+
+      const extractSource = (entry) => {
+        try { return new URL(entry.url).hostname; } catch { return ''; }
+      };
+
+      const getSourceIcon = (entry) => {
+        const hostname = extractSource(entry);
+        for (const [key, iconUrl] of Object.entries(SOCIAL_ICONS)) {
+          if (hostname.includes(key)) return iconUrl + '?size=16';
+        }
+        return `https://www.google.com/s2/favicons?domain=${hostname}&sz=32`;
+      };
+
       const formatDate = (d) => {
         try { return new Date(d).toLocaleDateString("en-US", { year:"numeric", month:"short", day:"numeric" }); } catch { return ""; }
       };
@@ -131,6 +153,8 @@ const articleUrl = frontmatter.url ?? `${config.site.baseUrl}/${frontmatter.slug
         const content = (reply.content?.text || "").replace(/<[^>]*>/g,"").slice(0,280);
         const date = formatDate(reply.published || reply["wm-received"]);
         const initial = name.charAt(0).toUpperCase();
+        const source = extractSource(reply);
+        const sourceIcon = getSourceIcon(reply);
 
         const avatarHtml = photo
           ? `<img src="${escapeHtml(photo)}" alt="${escapeHtml(name)}" class="w-full h-full object-cover" loading="lazy" onerror="this.parentElement.style.display='none'">`
@@ -142,6 +166,10 @@ const articleUrl = frontmatter.url ?? `${config.site.baseUrl}/${frontmatter.slug
             <div class="flex items-center gap-2 flex-wrap">
               <a href="${escapeHtml(reply.url)}" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-zag-dark dark:text-zag-light hover:text-zag-accent-dark dark:hover:text-zag-accent-light zag-transition">${escapeHtml(name)}</a>
               ${date ? `<span class="text-xs text-zag-dark-muted">${date}</span>` : ""}
+              <a href="${escapeHtml(reply.url)}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1 text-xs text-zag-dark-muted hover:text-zag-accent-dark dark:hover:text-zag-accent-light zag-transition" title="Mention from ${escapeHtml(source)}">
+                <img src="${sourceIcon}" alt="${escapeHtml(source)}" class="w-3 h-3 rounded-sm" loading="lazy" onerror="this.style.display='none'">
+                <span>${escapeHtml(source)}</span>
+              </a>
             </div>
             ${content ? `<p class="mt-1 text-sm text-zag-dark-muted leading-relaxed line-clamp-3">${escapeHtml(content)}</p>` : ""}
           </div>
@@ -162,10 +190,21 @@ const articleUrl = frontmatter.url ?? `${config.site.baseUrl}/${frontmatter.slug
           const name = e.author?.name || new URL(e.url).hostname;
           const photo = e.author?.photo;
           const initial = name.charAt(0).toUpperCase();
+          const source = extractSource(e);
+          const sourceIcon = getSourceIcon(e);
           const avatarHtml = photo
             ? `<img src="${escapeHtml(photo)}" alt="${escapeHtml(name)}" class="w-full h-full object-cover" loading="lazy" onerror="this.parentElement.style.display='none'">`
             : `<span class="w-full h-full flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-300">${initial}</span>`;
-          return `<a href="${escapeHtml(e.url)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(name)} ${label}" class="block w-8 h-8 rounded-full bg-zinc-300 dark:bg-zinc-700 ring-2 ring-zag-bg overflow-hidden flex-shrink-0">${avatarHtml}</a>`;
+          return `<div class="relative inline-block">
+            <a href="${escapeHtml(e.url)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(name)} (via ${escapeHtml(source)}) ${label}" class="block w-8 h-8 rounded-full bg-zinc-300 dark:bg-zinc-700 ring-2 ring-zag-bg overflow-hidden flex-shrink-0">
+              ${avatarHtml}
+            </a>
+            <div class="absolute -bottom-1 -right-1 z-10">
+              <div class="w-4 h-4 rounded-full bg-white dark:bg-zinc-800 flex items-center justify-center ring-2 ring-white dark:ring-zinc-800">
+                <img src="${sourceIcon}" alt="${escapeHtml(source)}" class="w-3 h-3" loading="lazy" onerror="this.parentElement.style.display='none'">
+              </div>
+            </div>
+          </div>`;
         }).join("");
 
         const plusHtml = remaining > 0
@@ -174,7 +213,7 @@ const articleUrl = frontmatter.url ?? `${config.site.baseUrl}/${frontmatter.slug
 
         return `<div class="zag-border-b zag-transition pb-4">
           <h2 class="text-lg font-display mb-4">Reactions</h2>
-          <div class="flex items-center gap-2 flex-wrap">
+          <div class="flex items-center justify-between gap-2 flex-wrap">
             <div class="flex -space-x-2">${avatarsHtml}${plusHtml}</div>
             <span class="text-sm text-zag-dark-muted"><span class="reaction-text">${total} ${total === 1 ? "person" : "people"} ${label}</span></span>
           </div>

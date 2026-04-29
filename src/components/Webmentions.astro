@@ -8,13 +8,36 @@ type Props = {
 
 const { mentions, targetUrl } = Astro.props;
 
-const reactionCount = mentions.likes.length + mentions.reposts.length + mentions.bookmarks.length;
+const reactionCount =
+  mentions.likes.length + mentions.reposts.length + mentions.bookmarks.length;
 const totalMentions = reactionCount + mentions.replies.length;
 
 const MAX_AVATARS = 5;
 
+const SOCIAL_ICONS: Record<string, string> = {
+  "bsky.social": "https://cdn.simpleicons.org/bluesky",
+  "reddit.com": "https://cdn.simpleicons.org/reddit",
+  "twitter.com": "https://cdn.simpleicons.org/x",
+  "x.com": "https://cdn.simpleicons.org/x",
+  mastodon: "https://cdn.simpleicons.org/mastodon",
+  "linkedin.com": "https://cdn.simpleicons.org/linkedin",
+  "github.com": "https://cdn.simpleicons.org/github",
+};
+
 function extractName(entry: WebmentionEntry): string {
   return entry.author?.name || new URL(entry.url).hostname;
+}
+
+function extractSource(entry: WebmentionEntry): string {
+  return new URL(entry.url).hostname;
+}
+
+function getSourceIcon(entry: WebmentionEntry): string {
+  const hostname = extractSource(entry);
+  for (const [key, iconUrl] of Object.entries(SOCIAL_ICONS)) {
+    if (hostname.includes(key)) return iconUrl + "?size=16";
+  }
+  return `https://www.google.com/s2/favicons?domain=${hostname}&sz=32`;
 }
 
 function extractPhoto(entry: WebmentionEntry): string | null {
@@ -49,7 +72,11 @@ function getReactionLabel(): string {
   return parts.length > 0 ? parts.join(" and ") + " this" : "";
 }
 
-function getVisibleReactions(): { photo: string | null; name: string; entry: WebmentionEntry }[] {
+function getVisibleReactions(): {
+  photo: string | null;
+  name: string;
+  entry: WebmentionEntry;
+}[] {
   const all = [...mentions.likes, ...mentions.reposts, ...mentions.bookmarks];
   return all.slice(0, MAX_AVATARS).map((entry) => ({
     photo: extractPhoto(entry),
@@ -63,7 +90,11 @@ function getRemainingCount(): number {
 }
 ---
 
-<div id="webmentions-container" data-target-url={targetUrl} class:list={["mt-12 mb-8", { hidden: totalMentions === 0 }]}>
+<div
+  id="webmentions-container"
+  data-target-url={targetUrl}
+  class:list={["mt-12 mb-8", { hidden: totalMentions === 0 }]}
+>
   {
     reactionCount > 0 && (
       <Fragment>
@@ -72,44 +103,54 @@ function getRemainingCount(): number {
 
           <div class="flex items-center gap-2 flex-wrap">
             <div class="flex -space-x-2">
-              {
-                getVisibleReactions().map((r, i) => (
+              {getVisibleReactions().map((r, i) => (
+                <div class="relative inline-block">
                   <a
                     href={r.entry.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    title={`${r.name} ${getReactionLabel()}`}
+                    title={`${r.name} (via ${extractSource(r.entry)}) ${getReactionLabel()}`}
                     class="block w-8 h-8 rounded-full bg-zinc-300 dark:bg-zinc-700 ring-2 ring-zag-bg overflow-hidden flex-shrink-0"
                   >
-                    {
-                      r.photo ? (
-                        <img
-                          src={r.photo}
-                          alt={r.name}
-                          class="w-full h-full object-cover"
-                          loading="lazy"
-                          onerror="this.parentElement.style.display='none'"
-                        />
-                      ) : (
-                        <span class="w-full h-full flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-300">
-                          {r.name.charAt(0).toUpperCase()}
-                        </span>
-                      )
-                    }
+                    {r.photo ? (
+                      <img
+                        src={r.photo}
+                        alt={r.name}
+                        class="w-full h-full object-cover"
+                        loading="lazy"
+                        onerror="this.parentElement.style.display='none'"
+                      />
+                    ) : (
+                      <span class="w-full h-full flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-300">
+                        {r.name.charAt(0).toUpperCase()}
+                      </span>
+                    )}
                   </a>
-                ))
-              }
-              {
-                getRemainingCount() > 0 && (
-                  <span class="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 ring-2 ring-zag-bg flex items-center justify-center text-xs font-medium text-zag-dark-muted">
-                    +{getRemainingCount()}
-                  </span>
-                )
-              }
+                  <div class="absolute -bottom-1 -right-1 z-10">
+                    <div class="w-4 h-4 rounded-full bg-white dark:bg-zinc-800 flex items-center justify-center ring-2 ring-white dark:ring-zinc-800">
+                      <img
+                        src={getSourceIcon(r.entry)}
+                        alt={extractSource(r.entry)}
+                        class="w-3 h-3"
+                        loading="lazy"
+                        onerror="this.parentElement.style.display='none'"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {getRemainingCount() > 0 && (
+                <span class="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 ring-2 ring-zag-bg flex items-center justify-center text-xs font-medium text-zag-dark-muted">
+                  +{getRemainingCount()}
+                </span>
+              )}
             </div>
 
             <span class="text-sm text-zag-dark-muted">
-              <span class="reaction-text">{reactionCount} {reactionCount === 1 ? "person" : "people"} {getReactionLabel()}</span>
+              <span class="reaction-text">
+                {reactionCount} {reactionCount === 1 ? "person" : "people"}{" "}
+                {getReactionLabel()}
+              </span>
             </span>
           </div>
         </div>
@@ -122,64 +163,76 @@ function getRemainingCount(): number {
       <div class="mt-6 zag-border-b zag-transition pb-4">
         <h3 class="text-base font-display mb-4">Replies</h3>
         <div class="flex flex-col gap-4">
-          {
-            mentions.replies.map((reply) => {
-              const name = extractName(reply);
-              const photo = extractPhoto(reply);
-              const content = sanitizeContent(reply);
-              const date = formatDate(reply.published || reply["wm-received"]);
+          {mentions.replies.map((reply) => {
+            const name = extractName(reply);
+            const photo = extractPhoto(reply);
+            const content = sanitizeContent(reply);
+            const date = formatDate(reply.published || reply["wm-received"]);
 
-              return (
-                <div
-                  data-wm-id={reply["wm-id"]}
-                  class="flex gap-3 p-3 bg-zinc-50 dark:bg-zinc-900 rounded-lg zag-transition"
+            return (
+              <div
+                data-wm-id={reply["wm-id"]}
+                class="flex gap-3 p-3 bg-zinc-50 dark:bg-zinc-900 rounded-lg zag-transition"
+              >
+                <a
+                  href={reply.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex-shrink-0 w-10 h-10 rounded-full bg-zinc-300 dark:bg-zinc-700 overflow-hidden"
                 >
-                  <a
-                    href={reply.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="flex-shrink-0 w-10 h-10 rounded-full bg-zinc-300 dark:bg-zinc-700 overflow-hidden"
-                  >
-                    {
-                      photo ? (
-                        <img
-                          src={photo}
-                          alt={name}
-                          class="w-full h-full object-cover"
-                          loading="lazy"
-                          onerror="this.parentElement.style.display='none'"
-                        />
-                      ) : (
-                        <span class="w-full h-full flex items-center justify-center text-sm font-bold text-zinc-600 dark:text-zinc-300">
-                          {name.charAt(0).toUpperCase()}
-                        </span>
-                      )
-                    }
-                  </a>
-                  <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2 flex-wrap">
-                      <a
-                        href={reply.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="text-sm font-semibold text-zag-dark dark:text-zag-light hover:text-zag-accent-dark dark:hover:text-zag-accent-light zag-transition"
-                      >
-                        {name}
-                      </a>
-                      {date && (
-                        <span class="text-xs text-zag-dark-muted">{date}</span>
-                      )}
-                    </div>
-                    {content && (
-                      <p class="mt-1 text-sm text-zag-dark-muted leading-relaxed line-clamp-3">
-                        {content}
-                      </p>
+                  {photo ? (
+                    <img
+                      src={photo}
+                      alt={name}
+                      class="w-full h-full object-cover"
+                      loading="lazy"
+                      onerror="this.parentElement.style.display='none'"
+                    />
+                  ) : (
+                    <span class="w-full h-full flex items-center justify-center text-sm font-bold text-zinc-600 dark:text-zinc-300">
+                      {name.charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                </a>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <a
+                      href={reply.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-sm font-semibold text-zag-dark dark:text-zag-light hover:text-zag-accent-dark dark:hover:text-zag-accent-light zag-transition"
+                    >
+                      {name}
+                    </a>
+                    {date && (
+                      <span class="text-xs text-zag-dark-muted">{date}</span>
                     )}
+                    <a
+                      href={reply.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="flex items-center gap-1 text-xs text-zag-dark-muted hover:text-zag-accent-dark dark:hover:text-zag-accent-light zag-transition"
+                      title={`Mention from ${extractSource(reply)}`}
+                    >
+                      <img
+                        src={getSourceIcon(reply)}
+                        alt={extractSource(reply)}
+                        class="w-3 h-3 rounded-sm"
+                        loading="lazy"
+                        onerror="this.style.display='none'"
+                      />
+                      <span>{extractSource(reply)}</span>
+                    </a>
                   </div>
+                  {content && (
+                    <p class="mt-1 text-sm text-zag-dark-muted leading-relaxed line-clamp-3">
+                      {content}
+                    </p>
+                  )}
                 </div>
-              );
-            })
-          }
+              </div>
+            );
+          })}
         </div>
       </div>
     )
