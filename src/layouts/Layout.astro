@@ -9,23 +9,21 @@ import "../styles/global.css";
   <head>
     <!-- Theme detection - MUST be first to prevent flash -->
     <script is:inline>
-      (() => {
-        const prefersDark = () => window.matchMedia("(prefers-color-scheme: dark)").matches;
-        const saved = (() => { try { return localStorage.getItem("theme"); } catch { return null; } })();
-        const isDark = saved ? saved === "dark" : prefersDark();
-
-        document.documentElement.classList.toggle("dark", isDark);
-        if (!isDark && prefersDark()) document.documentElement.classList.add("force-light");
-        document.documentElement.style.backgroundColor = isDark ? "#18181b" : "#fff";
-        document.documentElement.style.colorScheme = isDark ? "dark" : "light";
-
-        window.__applyTheme = (theme) => {
-          const isDark = theme === "dark";
-          document.documentElement.classList.toggle("dark", isDark);
-          document.documentElement.classList.toggle("force-light", !isDark && prefersDark());
-          document.documentElement.style.backgroundColor = isDark ? "#18181b" : "#fff";
-          document.documentElement.style.colorScheme = isDark ? "dark" : "light";
+      (function () {
+        const m = document.cookie.match(/(?:^|; )theme=(light|dark)/);
+        const html = document.documentElement;
+        const s = (t) => {
+          html.classList.toggle("dark", t === "dark");
+          html.style.backgroundColor = t === "dark" ? "#18181b" : "#fff";
+          html.style.colorScheme = t === "dark" ? "dark" : "light";
         };
+        if (m) return s(m[1]);
+        try {
+          const stored = localStorage.getItem("theme");
+          if (stored) return s(stored);
+        } catch {}
+        if (window.matchMedia("(prefers-color-scheme: dark)").matches) return s("dark");
+        s("light");
       })();
     </script>
 

@@ -29,18 +29,18 @@
     window.__themeToggleInitialized = true;
 
     const handleToggleClick = () => {
-      const element = document.documentElement;
-      const nextTheme = element.classList.contains("dark") ? "light" : "dark";
-      try { localStorage.setItem("theme", nextTheme); } catch {}
+      const html = document.documentElement;
+      const current = html.classList.contains("dark") ? "dark" : "light";
+      const next = current === "dark" ? "light" : "dark";
+      const isLocal = window.location.hostname === "localhost";
+      const secure = isLocal ? "" : ";Secure";
 
-      if (window.__applyTheme) {
-        window.__applyTheme(nextTheme);
-        return;
-      }
+      html.classList.toggle("dark", next === "dark");
+      html.style.backgroundColor = next === "dark" ? "#18181b" : "#fff";
+      html.style.colorScheme = next === "dark" ? "dark" : "light";
 
-      element.classList.toggle("dark", nextTheme === "dark");
-      element.style.backgroundColor = nextTheme === "dark" ? "#18181b" : "#fff";
-      element.style.colorScheme = nextTheme === "dark" ? "dark" : "light";
+      try { localStorage.setItem("theme", next); } catch {}
+      document.cookie = `theme=${next};path=/;max-age=31536000;SameSite=Lax${secure}`;
     };
 
     document.addEventListener("click", (e) => {
