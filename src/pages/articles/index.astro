@@ -257,4 +257,26 @@ const { data: config } = await getConfigurationCollection();
       }
     }
   </style>
+
+  <script is:inline>
+    const spriteHover = document.getElementById("sprite-hover");
+    if (spriteHover) {
+      const audio = new Audio("/parchment.mp3");
+      audio.volume = 0.5;
+      let lastPlayed = 0;
+
+      spriteHover.addEventListener("mouseenter", () => {
+        const now = Date.now();
+        if (now - lastPlayed < 500) return;
+        lastPlayed = now;
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+      });
+
+      spriteHover.addEventListener("mouseleave", () => {
+        audio.pause();
+        audio.currentTime = 0;
+      });
+    }
+  </script>
 </Layout>

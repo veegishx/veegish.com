@@ -1,3 +1,7 @@
 Lamentos del infierno (Evil Sound Effect on Guestbook page) by <a href="https://pixabay.com/users/u_g0akwz8ml1-42683749/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=194453">u_g0akwz8ml1</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=194453">Pixabay</a>
 
 Bubbles (Potion sound effect on projects page) by <a href="https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=6397">freesound_community</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=6397">Pixabay</a>
+
+Bubbles (Chat bubble sound effect on homepage) by <a href="https://pixabay.com/users/universfield-28281460/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=323580">Universfield</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=323580">Pixabay</a>
+
+Heavy Parchment (Paper sound on articles page) by <a href="https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=107797">freesound_community</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=107797">Pixabay</a>

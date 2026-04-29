@@ -35,9 +35,10 @@ const { data: config } = await getConfigurationCollection();
       <p set:html={config.hero.subtitle} />
     </h2>
     <p
-      class="mt-4 text-center text-sm text-zag-dark-muted font-mono font-medium sm:text-left"
-      set:html={config.hero.extraText}
-    />
+      class="mt-4 text-center text-sm text-zag-dark-muted font-mono font-medium sm:text-left flashlight-text"
+      data-content={config.hero.extraText}
+    >
+    </p>
   </div>
 </div>
 
@@ -119,7 +120,8 @@ const { data: config } = await getConfigurationCollection();
   }
 
   @keyframes float {
-    0%, 100% {
+    0%,
+    100% {
       transform: translateY(0);
     }
     50% {
@@ -173,6 +175,114 @@ const { data: config } = await getConfigurationCollection();
     document.addEventListener("astro:page-load", () => {
       clearInterval(interval);
       initChatBubble();
+    });
+  })();
+
+  (() => {
+    function wrapWords(element) {
+      const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+      const textNodes = [];
+      while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+      textNodes.forEach((node) => {
+        const fragment = document.createDocumentFragment();
+        node.textContent.split(/(\s+)/).forEach((part) => {
+          if (part.trim().length > 0) {
+            const span = document.createElement("span");
+            span.textContent = part;
+            fragment.appendChild(span);
+          } else {
+            fragment.appendChild(document.createTextNode(part));
+          }
+        });
+        node.parentNode.replaceChild(fragment, node);
+      });
+    }
+
+    function initFlashlight() {
+      const el = document.querySelector(".flashlight-text");
+      if (!el) {
+        console.log("Flashlight: element not found");
+        return;
+      }
+
+      // Clear existing content and set HTML via JS to ensure we can wrap it
+      const htmlContent = el.getAttribute("data-content");
+      if (htmlContent) {
+        el.innerHTML = htmlContent;
+      }
+
+      wrapWords(el);
+
+      let raf;
+      el.addEventListener("mousemove", (e) => {
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          const mx = e.clientX;
+          const my = e.clientY;
+          let litCount = 0;
+
+          el.querySelectorAll("span").forEach((span) => {
+            const rect = span.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const dist = Math.hypot(cx - mx, cy - my);
+            const isLit = dist < 50;
+            if (isLit) {
+              // span.style.color = "#000000";
+              span.style.color = "oklch(58.5% 0.233 277.117)";
+              span.style.textShadow =
+                "1px 1px 0 rgba(255, 255, 255, 0.15), 2px 2px 0 rgba(255, 255, 255, 0.1), 3px 3px 0 rgba(255, 255, 255, 0.05), 4px 4px 2px rgba(255, 255, 255, 0.025)";
+              litCount++;
+            } else {
+              span.style.color = "";
+              span.style.textShadow = "";
+            }
+          });
+          if (litCount > 0) console.log("Lit words:", litCount);
+        });
+      });
+
+      el.addEventListener("mouseleave", () => {
+        el.querySelectorAll("span").forEach((span) => {
+          span.style.color = "";
+          span.style.backgroundColor = "";
+          span.style.textShadow = "";
+        });
+      });
+    }
+
+    // Use MutationObserver to detect when element is ready
+    const observer = new MutationObserver((mutations, obs) => {
+      const el = document.querySelector(".flashlight-text");
+      if (el && el.innerHTML.length > 0) {
+        obs.disconnect();
+        setTimeout(initFlashlight, 0);
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Fallback: try immediately
+    setTimeout(initFlashlight, 100);
+    document.addEventListener("astro:page-load", () => {
+      setTimeout(initFlashlight, 100);
+    });
+  })();
+  (() => {
+    const chatBubble = document.querySelector(".chatbubble-wrapper");
+    if (!chatBubble) return;
+
+    const audio = new Audio("/chat-bubble.mp3");
+    audio.volume = 0.5;
+    let lastPlayed = 0;
+
+    chatBubble.addEventListener("mouseenter", () => {
+      const now = Date.now();
+      if (now - lastPlayed < 500) return; // Throttle: max once per 500ms
+      lastPlayed = now;
+      audio.currentTime = 0;
+      audio.play().catch(() => {}); // Ignore autoplay errors
     });
   })();
 </script>

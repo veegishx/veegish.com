@@ -1,5 +1,4 @@
 ---
-
 import { getConfigurationCollection } from "../lib/utils";
 import Anchor from "./common/Anchor.astro";
 import Section from "./common/Section.astro";
@@ -43,7 +42,10 @@ const year = date.getFullYear();
       <div class="flex flex-row sm:flex-col gap-4">
         {
           config.personal.githubProfile && (
-            <Anchor url={config.personal.githubProfile} aria-label={`${config.personal.name} GitHub Profile`}>
+            <Anchor
+              url={config.personal.githubProfile}
+              aria-label={`${config.personal.name} GitHub Profile`}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -61,7 +63,10 @@ const year = date.getFullYear();
         }
         {
           config.personal.twitterProfile && (
-            <Anchor url={config.personal.twitterProfile} aria-label={`${config.personal.name} X Profile`}>
+            <Anchor
+              url={config.personal.twitterProfile}
+              aria-label={`${config.personal.name} X Profile`}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -79,7 +84,10 @@ const year = date.getFullYear();
         }
         {
           config.personal.linkedinProfile && (
-            <Anchor url={config.personal.linkedinProfile} aria-label={`${config.personal.name} LinkedIn Profile`}>
+            <Anchor
+              url={config.personal.linkedinProfile}
+              aria-label={`${config.personal.name} LinkedIn Profile`}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="32"
@@ -101,8 +109,15 @@ const year = date.getFullYear();
   </Section>
   <p class="zag-text zag-transition text-center text-sm font-medium">
     &copy; {year}
-    {config.personal.name}. All rights reserved.
+    <span class="rights-reserved-trigger"
+      >{config.personal.name}. All rights reserved.</span
+    >
   </p>
+  <div
+    class="sad-cat-wrapper fixed -right-2 top-19 -rotate-90 translate-x-full opacity-0 transition-all duration-500 hidden sm:block"
+  >
+    <img src="/sad_cat.png" alt="Sad cat" class="w-32 h-32 object-contain" />
+  </div>
 </footer>
 
 <script is:inline>
@@ -218,4 +233,22 @@ const year = date.getFullYear();
 
   initFooterQuote();
   document.addEventListener("astro:page-load", initFooterQuote);
+
+  (() => {
+    const trigger = document.querySelector(".rights-reserved-trigger");
+    const cat = document.querySelector(".sad-cat-wrapper");
+
+    if (!trigger || !cat) return;
+
+    trigger.addEventListener("mouseenter", () => {
+      if (window.innerWidth < 640) return; // Only on desktop
+      cat.classList.remove("translate-x-full", "opacity-0");
+      cat.classList.add("translate-x-0", "opacity-100");
+    });
+
+    trigger.addEventListener("mouseleave", () => {
+      cat.classList.add("translate-x-full", "opacity-0");
+      cat.classList.remove("translate-x-0", "opacity-100");
+    });
+  })();
 </script>
