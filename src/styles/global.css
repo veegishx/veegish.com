@@ -57,6 +57,12 @@
 
 @layer base {
   html {
+    --page-transition-bg: var(--color-zag-dark);
+    background-color: var(--page-transition-bg);
+    color-scheme: dark;
+  }
+
+  html:not(.dark) {
     --page-transition-bg: var(--color-zag-light);
     background-color: var(--page-transition-bg);
     color-scheme: light;
