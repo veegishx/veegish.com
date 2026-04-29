@@ -119,40 +119,90 @@ const articleUrl = frontmatter.url ?? `${config.site.baseUrl}/${frontmatter.slug
           .filter(Boolean)
       );
 
+      const escapeHtml = (s) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
+      const formatDate = (d) => {
+        try { return new Date(d).toLocaleDateString("en-US", { year:"numeric", month:"short", day:"numeric" }); } catch { return ""; }
+      };
+
+      const renderReplyCard = (reply) => {
+        const name = reply.author?.name || new URL(reply.url).hostname;
+        const photo = reply.author?.photo;
+        const content = (reply.content?.text || "").replace(/<[^>]*>/g,"").slice(0,280);
+        const date = formatDate(reply.published || reply["wm-received"]);
+        const initial = name.charAt(0).toUpperCase();
+
+        const avatarHtml = photo
+          ? `<img src="${escapeHtml(photo)}" alt="${escapeHtml(name)}" class="w-full h-full object-cover" loading="lazy" onerror="this.parentElement.style.display='none'">`
+          : `<span class="w-full h-full flex items-center justify-center text-sm font-bold text-zinc-600 dark:text-zinc-300">${initial}</span>`;
+
+        return `<div data-wm-id="${reply["wm-id"]}" class="flex gap-3 p-3 bg-zinc-50 dark:bg-zinc-900 rounded-lg zag-transition">
+          <a href="${escapeHtml(reply.url)}" target="_blank" rel="noopener noreferrer" class="flex-shrink-0 w-10 h-10 rounded-full bg-zinc-300 dark:bg-zinc-700 overflow-hidden">${avatarHtml}</a>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <a href="${escapeHtml(reply.url)}" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-zag-dark dark:text-zag-light hover:text-zag-accent-dark dark:hover:text-zag-accent-light zag-transition">${escapeHtml(name)}</a>
+              ${date ? `<span class="text-xs text-zag-dark-muted">${date}</span>` : ""}
+            </div>
+            ${content ? `<p class="mt-1 text-sm text-zag-dark-muted leading-relaxed line-clamp-3">${escapeHtml(content)}</p>` : ""}
+          </div>
+        </div>`;
+      };
+
+      const renderReactionAvatars = (entries) => {
+        const all = entries.filter((e) => e["wm-property"] === "like-of" || e["wm-property"] === "repost-of" || e["wm-property"] === "bookmark-of");
+        const total = all.length;
+        const visible = all.slice(0, 5);
+        const remaining = Math.max(0, total - 5);
+
+        const labels = { "like-of":"liked", "repost-of":"reposted", "bookmark-of":"bookmarked" };
+        const parts = new Set(all.map((e) => labels[e["wm-property"]]));
+        const label = [...parts].join(" and ") + " this";
+
+        const avatarsHtml = visible.map((e) => {
+          const name = e.author?.name || new URL(e.url).hostname;
+          const photo = e.author?.photo;
+          const initial = name.charAt(0).toUpperCase();
+          const avatarHtml = photo
+            ? `<img src="${escapeHtml(photo)}" alt="${escapeHtml(name)}" class="w-full h-full object-cover" loading="lazy" onerror="this.parentElement.style.display='none'">`
+            : `<span class="w-full h-full flex items-center justify-center text-xs font-bold text-zinc-600 dark:text-zinc-300">${initial}</span>`;
+          return `<a href="${escapeHtml(e.url)}" target="_blank" rel="noopener noreferrer" title="${escapeHtml(name)} ${label}" class="block w-8 h-8 rounded-full bg-zinc-300 dark:bg-zinc-700 ring-2 ring-zag-bg overflow-hidden flex-shrink-0">${avatarHtml}</a>`;
+        }).join("");
+
+        const plusHtml = remaining > 0
+          ? `<span class="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 ring-2 ring-zag-bg flex items-center justify-center text-xs font-medium text-zag-dark-muted">+${remaining}</span>`
+          : "";
+
+        return `<div class="zag-border-b zag-transition pb-4">
+          <h2 class="text-lg font-display mb-4">Reactions</h2>
+          <div class="flex items-center gap-2 flex-wrap">
+            <div class="flex -space-x-2">${avatarsHtml}${plusHtml}</div>
+            <span class="text-sm text-zag-dark-muted"><span class="reaction-text">${total} ${total === 1 ? "person" : "people"} ${label}</span></span>
+          </div>
+        </div>`;
+      };
+
       fetch(`https://webmention.io/api/mentions.jf2?target=${encodeURIComponent(targetUrl)}`)
         .then((r) => r.json())
         .then((data) => {
-          const newEntries = (data.children || []).filter(
-            (e) => e["wm-id"] && !existingIds.has(String(e["wm-id"]))
-          );
+          const entries = data.children || [];
+          const newEntries = entries.filter((e) => e["wm-id"] && !existingIds.has(String(e["wm-id"])));
+          const allEntries = existingIds.size === 0 ? entries : [...entries.filter((e) => !existingIds.has(String(e["wm-id"]))), ...entries.filter((e) => existingIds.has(String(e["wm-id"])))];
 
-          if (newEntries.length === 0) return;
+          if (allEntries.length === 0) return;
 
-          const reactionsContainer = container.querySelector(".reaction-text");
-          if (reactionsContainer) {
-            const currentMatch = reactionsContainer.textContent.match(/^(\d+)/);
-            const currentCount = currentMatch ? parseInt(currentMatch[1], 10) : 0;
-            const newReactionCount = newEntries.filter(
-              (e) => e["wm-property"] === "like-of" || e["wm-property"] === "repost-of" || e["wm-property"] === "bookmark-of"
-            ).length;
-            const totalCount = currentCount + newReactionCount;
-            reactionsContainer.textContent = `${totalCount} ${totalCount === 1 ? "person" : "people"} reacted to this`;
+          container.classList.remove("hidden");
+
+          const hasReactions = allEntries.some((e) => e["wm-property"] === "like-of" || e["wm-property"] === "repost-of" || e["wm-property"] === "bookmark-of");
+          const hasReplies = allEntries.some((e) => e["wm-property"] === "in-reply-to");
+
+          let html = "";
+          if (hasReactions) html += renderReactionAvatars(allEntries);
+          if (hasReplies) {
+            const repliesHtml = allEntries.filter((e) => e["wm-property"] === "in-reply-to").map(renderReplyCard).join("");
+            html += `<div class="mt-6 zag-border-b zag-transition pb-4"><h3 class="text-base font-display mb-4">Replies</h3><div class="flex flex-col gap-4">${repliesHtml}</div></div>`;
           }
 
-          const repliesSection = container.querySelector(".flex.flex-col.gap-4");
-          const existingRepliesSection = repliesSection?.closest(".zag-border-b");
-
-          if (newEntries.filter((e) => e["wm-property"] === "in-reply-to").length > 0) {
-            if (!existingRepliesSection) {
-              const newSection = document.createElement("div");
-              newSection.className = "mt-6 zag-border-b zag-transition pb-4";
-              newSection.innerHTML = `<h3 class="text-base font-display mb-4">Replies</h3>`;
-              const replyList = document.createElement("div");
-              replyList.className = "flex flex-col gap-4";
-              newSection.appendChild(replyList);
-              container.appendChild(newSection);
-            }
-          }
+          container.innerHTML = html;
         })
         .catch(() => {});
     })();
