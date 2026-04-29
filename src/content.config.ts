@@ -329,6 +329,7 @@ const blog = defineCollection({
         data.title
           .toLowerCase()
           .replace(/\s+/g, "-")
+          .replace(/-+/g, "-")
           .replace(/[^\w-]/g, "");
       const newData = {
         ...data,
@@ -405,6 +406,7 @@ const project = defineCollection({
         data.title
           .toLowerCase()
           .replace(/\s+/g, "-")
+          .replace(/-+/g, "-")
           .replace(/[^\w-]/g, "");
       const newData = {
         ...data,
