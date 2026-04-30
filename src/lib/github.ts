@@ -135,7 +135,12 @@ export async function getRecentEvents(): Promise<GitHubEvent[]> {
     }
 
     const events: GitHubEvent[] = await response.json();
-    return events.slice(0, 20);
+    return events
+      .filter(
+        (event) =>
+          event.type !== "PushEvent" || event.payload.commits?.length > 0,
+      )
+      .slice(0, 20);
   } catch (error) {
     console.error("Failed to fetch events:", error);
     return [];
