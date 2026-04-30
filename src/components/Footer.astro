@@ -140,22 +140,30 @@ const year = date.getFullYear();
   </Section>
 
   <div
-    class="flex flex-col-reverse sm:flex-row items-center flag-sprite-wrapper zag-border-b mb-4 max-w-xl mx-auto"
+    class="relative flex flex-col-reverse sm:flex-row items-center flag-sprite-wrapper zag-border-b mb-4 max-w-xl mx-auto"
   >
     <div class="flag-sprite"></div>
     <div class="flex flex-col gap-2">
-      <p class="zag-text zag-transition text-sm font-medium">
+      <p class="text-slate-400 zag-transition text-sm font-medium">
         Proudly crafted in
       </p>
-      <p class="font-display text-2xl">Mauritius</p>
+      <p class="font-display text-2xl mauritius-text">
+        <span>M</span><span>a</span><span>u</span><span>r</span><span>i</span
+        ><span>t</span><span>i</span><span>u</span><span>s</span>
+      </p>
     </div>
+    <p
+      class="hidden md:block text-xs text-slate-600 absolute bottom-2 max-w-xs text-center mx-auto left-0 right-0"
+    >
+      i'm truly terrible at drawing and animating flags (or just in general)
+    </p>
   </div>
 
-  <p class="zag-text zag-transition text-center text-sm font-medium">
+  <p
+    class="rights-reserved-trigger zag-text zag-transition text-center text-sm font-medium"
+  >
     &copy; {year}
-    <span class="rights-reserved-trigger"
-      >{config.personal.name}. All rights reserved.</span
-    >
+    <span>{config.personal.name}. All rights reserved.</span>
   </p>
   <div
     class="sad-cat-wrapper fixed -right-2 top-19 -rotate-90 translate-x-full opacity-0 transition-all duration-500 hidden sm:block"
@@ -299,6 +307,28 @@ const year = date.getFullYear();
       cat.classList.remove("translate-x-0", "opacity-100");
     });
   })();
+
+  (() => {
+    const letterContainer = document.querySelector(".mauritius-text");
+    const letters = letterContainer?.querySelectorAll("span");
+    if (!letters.length) return;
+    const colors = ["#EA2839", "#1A206D", "#FFD500", "#00A551"];
+    let intervalId = null;
+    const animate = () => {
+      letters.forEach((letter) => {
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        letter.style.color = color;
+      });
+    };
+    letterContainer.addEventListener("mouseenter", () => {
+      animate();
+      intervalId = setInterval(animate, 500);
+    });
+    letterContainer.addEventListener("mouseleave", () => {
+      clearInterval(intervalId);
+      letters.forEach((letter) => (letter.style.color = ""));
+    });
+  })();
 </script>
 
 <style>
@@ -319,5 +349,10 @@ const year = date.getFullYear();
     to {
       background-position: -1920px 0;
     }
+  }
+
+  .mauritius-text span {
+    transition: color 0.3s ease;
+    display: inline-block;
   }
 </style>
