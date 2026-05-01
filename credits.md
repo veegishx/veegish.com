@@ -7,3 +7,5 @@ Bubbles (Chat bubble sound effect on homepage) by <a href="https://pixabay.com/u
 Heavy Parchment (Paper sound on articles page) by <a href="https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=107797">freesound_community</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=107797">Pixabay</a>
 
 Arcade melody (Retro music on homepage h1) by <a href="https://pixabay.com/users/lucadialessandro-25927643/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=295434">Luca Di Alessandro</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=295434">Pixabay</a>
+
+Original Mauritian anthem obtained from <a href="https://midi.polyna.eu/anthems/africa.html">Pauline’s MIDI collection</a> and transformed using <a href="https://www.famistudio.org/">FamiStudio 4.5.0</a>

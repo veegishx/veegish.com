@@ -329,6 +329,32 @@ const year = date.getFullYear();
       letters.forEach((letter) => (letter.style.color = ""));
     });
   })();
+  (() => {
+    const text = document.querySelector(".mauritius-text");
+    if (!text) return;
+
+    const audio = new Audio("/mauritius_anthem-8bit.mp3");
+    audio.volume = 0.5;
+    let mouseLeaveCalled = true;
+
+    text.addEventListener("mouseenter", () => {
+      mouseLeaveCalled = false;
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    });
+
+    text.addEventListener("mouseleave", () => {
+      mouseLeaveCalled = true;
+      audio.pause();
+    });
+
+    audio.addEventListener("ended", () => {
+      if (!mouseLeaveCalled) {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+      }
+    });
+  })();
 </script>
 
 <style>
