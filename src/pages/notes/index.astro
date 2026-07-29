@@ -25,7 +25,10 @@ const pageTitle = config.texts?.notesName ?? "Notes";
             name="description"
             content={`Personal notes, thoughts, and documentation by ${config.globalMeta.title}.`}
         />
-        <meta property="og:title" content={`${pageTitle} | ${config.globalMeta.title}`} />
+        <meta
+            property="og:title"
+            content={`${pageTitle} | ${config.globalMeta.title}`}
+        />
         <meta
             property="og:description"
             content={`Personal notes, thoughts, and documentation.`}
@@ -50,9 +53,8 @@ const pageTitle = config.texts?.notesName ?? "Notes";
             id="note-page-title"
             class="flex flex-col md:flex-row items-center gap-4 pt-8 pb-16"
         >
-            <span
-                class="scroll-sprite inline-block flex-none"
-                aria-hidden="true"></span>
+            <span class="note-sprite inline-block flex-none" aria-hidden="true"
+            ></span>
             <div
                 class="w-full flex flex-col items-center md:items-center md:flex-row md:justify-between gap-2"
             >
@@ -107,8 +109,8 @@ const pageTitle = config.texts?.notesName ?? "Notes";
 
     <style>
         :root {
-            --scroll-size: 146px;
-            --scroll-frames: 25;
+            --scroll-size: 80px;
+            --scroll-frames: 65;
         }
 
         @media (min-width: 768px) {
@@ -116,10 +118,11 @@ const pageTitle = config.texts?.notesName ?? "Notes";
             }
         }
 
-        .scroll-sprite {
+        .note-sprite {
+            margin-top: -45px;
             width: var(--scroll-size);
             height: var(--scroll-size);
-            background-image: url("/scrollsprite.png");
+            background-image: url("/notespritesheet.png");
             background-repeat: no-repeat;
             background-size: calc(var(--scroll-size) * var(--scroll-frames))
                 var(--scroll-size);
@@ -127,7 +130,7 @@ const pageTitle = config.texts?.notesName ?? "Notes";
             image-rendering: pixelated;
         }
 
-        #note-page-title:hover .scroll-sprite {
+        #note-page-title:hover .note-sprite {
             animation: scroll-anim 2s steps(var(--scroll-frames)) infinite;
         }
 
@@ -144,7 +147,7 @@ const pageTitle = config.texts?.notesName ?? "Notes";
         }
 
         @media (prefers-reduced-motion: reduce) {
-            #note-page-title:hover .scroll-sprite {
+            #note-page-title:hover .note-sprite {
                 animation: none;
             }
         }

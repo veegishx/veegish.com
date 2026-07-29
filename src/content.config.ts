@@ -234,6 +234,12 @@ const configuration = defineCollection({
        * The text used when displaying the notes section.
        */
       notesName: z.string().default("Notes"),
+      createdAt: z.string().default("Created At"),
+      updatedAt: z.string().default("Updated At"),
+      noteTag: z.string().default("Note"),
+      readingTime: z.string().default("Reading Time"),
+      noteDisclaimer: z.string().default("This is a note. A note isn't a full-fledged content meant for publication. They are rough drafts that may be incomplete. Unlike blog posts, notes can be occasionally updated and thus the content you are seeing today may not be same in the future. I primarily write them to help me remember things, but sometimes I choose to sync them to the public web in case they are helpful to you too. The syncing script can be found {here}"),
+      noteDisclaimerUrl: z.string().default("https://github.com/veegishx/veegish.com/blob/main/scripts/sync-notes.mjs"),
     }),
 
     /**
@@ -244,6 +250,7 @@ const configuration = defineCollection({
       home: z.string().default("/"),
       projects: z.string().default("/projects"),
       blog: z.string().default("/blog"),
+      notes: z.string().default("/notes"),
       about: z.string().default("/about"),
       /** Add other menu items here **/
     }),
