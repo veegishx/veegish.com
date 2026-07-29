@@ -1,0 +1,295 @@
+---
+import { getCollection } from "astro:content";
+import ArticleSnippet from "../../components/ArticleSnippet.astro";
+import Section from "../../components/common/Section.astro";
+import Layout from "../../layouts/Layout.astro";
+import {
+    getConfigurationCollection,
+    calculateReadingTime,
+} from "../../lib/utils";
+
+const notes = (await getCollection("notes")).sort((a, b) => {
+    const dateA = new Date(a.data.date || 0).getTime();
+    const dateB = new Date(b.data.date || 0).getTime();
+    return dateB - dateA;
+});
+
+const { data: config } = await getConfigurationCollection();
+const pageTitle = config.texts?.notesName ?? "Notes";
+---
+
+<Layout>
+    <Fragment slot="head">
+        <title>{pageTitle} | {config.globalMeta.title}</title>
+        <meta
+            name="description"
+            content={`Personal notes, thoughts, and documentation by ${config.globalMeta.title}.`}
+        />
+        <meta property="og:title" content={`${pageTitle} | ${config.globalMeta.title}`} />
+        <meta
+            property="og:description"
+            content={`Personal notes, thoughts, and documentation.`}
+        />
+        <meta property="og:url" content={`${config.site.baseUrl}/notes`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta
+            name="twitter:title"
+            content={`${pageTitle} | ${config.globalMeta.title}`}
+        />
+        <meta http-equiv="content-language" content="en" />
+        <meta name="language" content="English" />
+        <link rel="canonical" href={`${config.site.baseUrl}/notes`} />
+        <link
+            rel="webmention"
+            href="https://webmention.io/veegish.com/webmention"
+        />
+        <link rel="pingback" href="https://webmention.io/veegish.com/xmlrpc" />
+    </Fragment>
+    <Section class="my-0">
+        <div
+            id="note-page-title"
+            class="flex flex-col md:flex-row items-center gap-4 pt-8 pb-16"
+        >
+            <span
+                class="scroll-sprite inline-block flex-none"
+                aria-hidden="true"></span>
+            <div
+                class="w-full flex flex-col items-center md:items-center md:flex-row md:justify-between gap-2"
+            >
+                <h1
+                    class="page-title-glow font-display text-2xl sm:text-4xl leading-loose"
+                >
+                    {pageTitle}
+                </h1>
+                <a
+                    href="/graph"
+                    class="inline-flex items-center gap-2 px-3 py-2 text-sm bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg transition-colors"
+                    title="View knowledge graph"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <circle cx="18" cy="5" r="3"></circle>
+                        <circle cx="6" cy="12" r="3"></circle>
+                        <circle cx="18" cy="19" r="3"></circle>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                    </svg>
+                    Graph
+                </a>
+            </div>
+        </div>
+
+        <ul>
+            {
+                notes.map((note) => (
+                    <li>
+                        <ArticleSnippet
+                            title={note.data.title}
+                            description={note.data.description ?? ""}
+                            duration={`${calculateReadingTime(note.body)} min`}
+                            url={`/notes/${note.id.replace(/\.md$/, "")}`}
+                            timestamp={new Date(note.data.date || Date.now())}
+                        />
+                    </li>
+                ))
+            }
+        </ul>
+    </Section>
+
+    <style>
+        :root {
+            --scroll-size: 146px;
+            --scroll-frames: 25;
+        }
+
+        @media (min-width: 768px) {
+            :root {
+            }
+        }
+
+        .scroll-sprite {
+            width: var(--scroll-size);
+            height: var(--scroll-size);
+            background-image: url("/scrollsprite.png");
+            background-repeat: no-repeat;
+            background-size: calc(var(--scroll-size) * var(--scroll-frames))
+                var(--scroll-size);
+            background-position: 0 0;
+            image-rendering: pixelated;
+        }
+
+        #note-page-title:hover .scroll-sprite {
+            animation: scroll-anim 2s steps(var(--scroll-frames)) infinite;
+        }
+
+        @keyframes scroll-anim {
+            from {
+                background-position: 0 0;
+            }
+            to {
+                background-position: calc(
+                        -1 * var(--scroll-size) * var(--scroll-frames)
+                    )
+                    0;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #note-page-title:hover .scroll-sprite {
+                animation: none;
+            }
+        }
+
+        .page-title-glow {
+            text-shadow:
+                0 0 8px rgba(255, 255, 255, 0.35),
+                0 0 18px rgba(255, 255, 255, 0.18);
+            animation: glow-flicker 7s infinite;
+        }
+
+        @keyframes glow-flicker {
+            0%,
+            70%,
+            100% {
+                text-shadow:
+                    0 0 8px rgba(255, 255, 255, 0.35),
+                    0 0 18px rgba(255, 255, 255, 0.18);
+            }
+            71% {
+                text-shadow:
+                    0 0 4px rgba(255, 255, 255, 0.15),
+                    0 0 10px rgba(255, 255, 255, 0.08);
+            }
+            72% {
+                text-shadow:
+                    0 0 8px rgba(255, 255, 255, 0.35),
+                    0 0 18px rgba(255, 255, 255, 0.18);
+            }
+            73% {
+                text-shadow:
+                    0 0 3px rgba(255, 255, 255, 0.1),
+                    0 0 8px rgba(255, 255, 255, 0.05);
+            }
+            92% {
+                text-shadow:
+                    0 0 8px rgba(255, 255, 255, 0.35),
+                    0 0 18px rgba(255, 255, 255, 0.18);
+            }
+            93% {
+                text-shadow:
+                    0 0 5px rgba(255, 255, 255, 0.2),
+                    0 0 12px rgba(255, 255, 255, 0.1);
+            }
+            94% {
+                text-shadow:
+                    0 0 8px rgba(255, 255, 255, 0.35),
+                    0 0 18px rgba(255, 255, 255, 0.18);
+            }
+            95% {
+                text-shadow:
+                    0 0 2px rgba(255, 255, 255, 0.08),
+                    0 0 6px rgba(255, 255, 255, 0.04);
+            }
+            96% {
+                text-shadow:
+                    0 0 8px rgba(255, 255, 255, 0.35),
+                    0 0 18px rgba(255, 255, 255, 0.18);
+            }
+        }
+
+        :where(.dark, .dark *) .page-title-glow {
+            text-shadow:
+                0 0 10px rgba(255, 255, 255, 0.45),
+                0 0 22px rgba(255, 255, 255, 0.24);
+            animation: glow-flicker-dark 7s infinite;
+        }
+
+        @keyframes glow-flicker-dark {
+            0%,
+            70%,
+            100% {
+                text-shadow:
+                    0 0 10px rgba(255, 255, 255, 0.45),
+                    0 0 22px rgba(255, 255, 255, 0.24);
+            }
+            71% {
+                text-shadow:
+                    0 0 5px rgba(255, 255, 255, 0.2),
+                    0 0 12px rgba(255, 255, 255, 0.1);
+            }
+            72% {
+                text-shadow:
+                    0 0 10px rgba(255, 255, 255, 0.45),
+                    0 0 22px rgba(255, 255, 255, 0.24);
+            }
+            73% {
+                text-shadow:
+                    0 0 3px rgba(255, 255, 255, 0.12),
+                    0 0 8px rgba(255, 255, 255, 0.06);
+            }
+            92% {
+                text-shadow:
+                    0 0 10px rgba(255, 255, 255, 0.45),
+                    0 0 22px rgba(255, 255, 255, 0.24);
+            }
+            93% {
+                text-shadow:
+                    0 0 6px rgba(255, 255, 255, 0.25),
+                    0 0 14px rgba(255, 255, 255, 0.12);
+            }
+            94% {
+                text-shadow:
+                    0 0 10px rgba(255, 255, 255, 0.45),
+                    0 0 22px rgba(255, 255, 255, 0.24);
+            }
+            95% {
+                text-shadow:
+                    0 0 2px rgba(255, 255, 255, 0.1),
+                    0 0 6px rgba(255, 255, 255, 0.05);
+            }
+            96% {
+                text-shadow:
+                    0 0 10px rgba(255, 255, 255, 0.45),
+                    0 0 22px rgba(255, 255, 255, 0.24);
+            }
+        }
+    </style>
+
+    <script is:inline>
+        (() => {
+            const h1 = document.getElementById("note-page-title");
+            if (!h1) return;
+
+            const audio = new Audio("/parchment.mp3");
+            audio.volume = 0.5;
+            let mouseLeaveCalled = true;
+
+            h1.addEventListener("mouseenter", () => {
+                mouseLeaveCalled = false;
+                audio.currentTime = 0;
+                audio.play().catch(() => {});
+            });
+
+            h1.addEventListener("mouseleave", () => {
+                mouseLeaveCalled = true;
+                audio.pause();
+            });
+
+            audio.addEventListener("ended", () => {
+                if (!mouseLeaveCalled) {
+                    audio.currentTime = 0;
+                    audio.play().catch(() => {});
+                }
+            });
+        })();
+    </script>
+</Layout>

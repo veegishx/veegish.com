@@ -1,0 +1,79 @@
+---
+import { getCollection, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Section from "../../components/common/Section.astro";
+import Prose from "../../components/Prose.astro";
+import Backlinks from "../../components/Backlinks.astro";
+import {
+  getConfigurationCollection,
+  processArticleDate,
+  calculateReadingTime,
+} from "../../lib/utils";
+
+export async function getStaticPaths() {
+  const notes = await getCollection("notes");
+  return notes.map((note) => {
+    const slug = note.id.replace(/\.md$/, "");
+    return {
+      params: { slug },
+      props: { note, slug },
+    };
+  });
+}
+
+const { note, slug } = Astro.props;
+const { Content } = await render(note);
+const { data: config } = await getConfigurationCollection();
+const noteDate = note.data.date ? new Date(note.data.date) : new Date();
+const noteUpdatedAt = note.data.updatedAt ? new Date(note.data.updatedAt) : noteDate;
+const metaDescription = note.data.description || note.data.title;
+---
+
+<Layout>
+  <Fragment slot="head">
+    <title>{`${note.data.title} • ${config.personal.name}`}</title>
+    <meta name="description" content={metaDescription} />
+    <meta
+      property="og:title"
+      content={`${note.data.title} • ${config.personal.name}`}
+    />
+    <meta property="og:description" content={metaDescription} />
+    <meta
+      property="og:url"
+      content={`${config.site.baseUrl}/notes/${slug}`}
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content={`${note.data.title} • ${config.personal.name}`}
+    />
+    <link
+      rel="canonical"
+      href={`${config.site.baseUrl}/notes/${slug}`}
+    />
+  </Fragment>
+  <Section class="pt-8">
+    <article>
+      <div class="flex flex-col gap-4 mt-8 mb-16">
+        <h1 class="text-3xl sm:text-4xl leading-normal sm:leading-normal font-display">
+          {note.data.title}
+        </h1>
+        <div class="flex flex-col sm:flex-row justify-between gap-1">
+          <div class="flex gap-2 flex-wrap">
+            <time datetime={noteDate.toISOString()} class="text-sm" title={noteDate.toLocaleString()}>
+              Created: {processArticleDate(noteDate)}
+            </time>
+            <time datetime={noteUpdatedAt.toISOString()} class="text-sm text-zinc-500 dark:text-zinc-400" title={noteUpdatedAt.toLocaleString()}>
+              Updated: {processArticleDate(noteUpdatedAt)}
+            </time>
+          </div>
+          <span class="text-sm">{calculateReadingTime(note.body)} min</span>
+        </div>
+      </div>
+      <Prose>
+        <Content />
+      </Prose>
+      <Backlinks slug={slug} />
+    </article>
+  </Section>
+</Layout>

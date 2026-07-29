@@ -51,6 +51,7 @@ projectsName = "Projects"
 viewAll = "View All"
 noArticles = "No articles found."
 noProjects = "No projects found."
+notesName = "Notes"
 
 [_.menu]
 home = "/"

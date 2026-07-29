@@ -229,6 +229,11 @@ const configuration = defineCollection({
        * The text displayed when there are no projects found.
        */
       noProjects: z.string().default("No projects found."),
+
+      /**
+       * The text used when displaying the notes section.
+       */
+      notesName: z.string().default("Notes"),
     }),
 
     /**
@@ -416,4 +421,19 @@ const project = defineCollection({
     }),
 });
 
-export const collections = { blog, project, configuration };
+/**
+ * Loader and schema for the notes collection.
+ * It loads markdown files from the `content/notes` directory and defines the schema for each note.
+ */
+const notes = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./content/notes" }),
+  schema: z.object({
+    title: z.string(),
+    date: z.string().optional(),
+    updatedAt: z.string().optional(),
+    description: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+  }),
+});
+
+export const collections = { blog, project, notes, configuration };

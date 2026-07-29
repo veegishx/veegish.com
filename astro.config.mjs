@@ -20,7 +20,7 @@ export default defineConfig({
     },
     markdown: {
         remarkPlugins: [
-            [wikiLinkPlugin],
+            wikiLinkPlugin,
         ],
     },
 });
