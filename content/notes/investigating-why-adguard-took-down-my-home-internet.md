@@ -1,7 +1,7 @@
 ---
-title: "Investigating AdGuard taking down home internet"
+title: "Investigating why AdGuard took down my home internet"
 date: "2026-07-29 07:31:25.625Z"
-updatedAt: "2026-07-29 14:46:27.338Z"
+updatedAt: "2026-07-29 15:43:12.959Z"
 ---
 
 <p>A power outage occurred on 29/07/2026 at 05:24AM. Half a minute later power was restored and the server hosting my AdGuard home instance, among other services, was back online. All 10 containers and VM, including AdGuard were online at the time, but there was 1 problem - internet was down. This is a note of the steps executed, should they need to be performed again.</p><h2>Confirm access without getting out of bed</h2><ul><li data-list-item-id="e80088352abd0a4fd05a1739df9e84d9c">While on data (because WIFI and LAN are presumably both down in these cases), make sure NetBird VPN is active</li><li data-list-item-id="e5427cc00dce06a78fd233d63d4deb285">Check if Proxmox is accessible via direct IP access - 192.168.x.x</li><li data-list-item-id="e745eb30f2bdfc1cf1f05c41206c559dd">Check health of AdGuard container</li><li data-list-item-id="e848c4ac6cd2d06ee286ce8aa755857af">Realize it's time to get out of bed</li></ul><h2>Get out of bed and restore internet</h2><ul><li data-list-item-id="e88f898c9e1025372842b28e62f65f224">Connect PC with LAN and assign a static address<ul><li data-list-item-id="ec4fafea80355f8a71bbc011c811e1690"><pre><code class="language-text-x-trilium-auto">IP: 192.168.100.240
